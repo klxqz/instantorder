@@ -4,34 +4,65 @@
     #instantorder_dialog{
         display: none;
     }
+    #instantorder_table{
+        margin: 0 auto;
+    }
 </style>
 <script type='text/javascript'>
             $(function() {
-            $('.instantorder_button').click(function() {
-            $('#instantorder_dialog').dialog({
-            title: '{$settings.title}',
-                    width: {$settings.width_modal},
-                    height: {$settings.height_modal},
-                    modal: true,
-                    autoOpen: true,
-            });
-            });
+                $('.instantorder_button').click(function() {
+                    $('#instantorder_dialog').dialog({
+                    title: '{$settings.title}',
+                            width: {$settings.width_modal},
+                            height: {$settings.height_modal},
+                            modal: true,
+                            autoOpen: true,
+                    });
+                });
+                
+                $('#instantorder_form').submit(function(){
+                    $.ajax({
+                        type: 'POST',
+                        url: $(this).attr('action'),
+                        dataType: 'json',
+                        success: function(data, textStatus, jqXHR) {
+                            $('.response').html(data.data.message);
+                        }
+                    });
+                    return false;
+                });                
+                                
+                
+                
             });
 </script>
 
 
 <div class="instantorder_block">
-    <a class="instantorder_button" href="javascript:void(0);">{$settings.link_name}</a>
+    <a class="instantorder_button" href="javascript:void(0);"><img src="{$wa_app_static_url}plugins/instantorder/img/instantorder_but.gif" title="{$settings.link_name}"/></a>
 
     <div id="instantorder_dialog">
-        <table  id="haggle_table">
-            {foreach from=$selected_fields item=selected_field}
-            <tr>
-                <td>{$selected_field.name}<span class="required">*</span>:</td>
-                <td><input id="haggle_url" type="text" name="{$selected_field.type}" /></td>
-            </tr>
-            {/foreach}
-        </table>
+        <form id="instantorder_form" action="{$wa_app_url}instantorder/">
+            <table  id="instantorder_table">
+                {foreach from=$selected_fields item=selected_field}
+                <tr>
+                    <td>{$selected_field.name}{if $selected_field.required}<span class="required">*</span>{/if}:&nbsp;</td>
+                    <td><input type="text" name="{$selected_field.type}" value="{$contact->get($selected_field.type,'default')}" /></td>
+                </tr>
+                {/foreach}
+                <tr>
+                    <td colspan="2" align="center" >
+                        <input type="submit" value="Оформить заказ"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" align="center" class="response" >
+                        
+                    </td>
+                </tr>
+            </table>
+        </form>
 
     </div>
 </div>

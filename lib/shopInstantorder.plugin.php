@@ -30,10 +30,16 @@ class shopInstantorderPlugin extends shopPlugin {
     }
 
     public static function display() {
+        if (wa()->getUser()->isAuth()) {
+            $contact = wa()->getUser();
+            //$res = $contact->get("address.region", "default");
+            //print_r($res);
+        }
         $plugin = self::getThisPlugin();
         $instantorder_model = new shopInstantorderPluginModel();
         $selected_fields = $instantorder_model->getAll();
         $view = wa()->getView();
+        $view->assign('contact', $contact);
         $view->assign('settings', $plugin->getSettings());
         $view->assign('selected_fields', $selected_fields);
         $template_path = wa()->getAppPath('plugins/instantorder/templates/Instantorder.html', 'shop');

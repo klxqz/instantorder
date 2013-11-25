@@ -16,7 +16,7 @@
     {/foreach}
     <optgroup label="Адрес">
         {foreach from=$address_fields item=address}
-        <option value="address_{$address->getId()}">{$address->getName()}</option>
+        <option value="address.{$address->getId()}">{$address->getName()}</option>
         {/foreach}
     </optgroup>
 </select>
@@ -112,7 +112,7 @@
                     {/foreach}
                     <optgroup label="Адрес">
                     {foreach from=$address_fields item=address}
-                    <option {if $selected_field.type=="address_`$address->getId()`"}selected="selected"{/if} value="address_{$address->getId()}">{$address->getName()}</option>
+                    <option {if $selected_field.type=="address.`$address->getId()`"}selected="selected"{/if} value="address.{$address->getId()}">{$address->getName()}</option>
                     {/foreach}
                     </optgroup>
                 </select>

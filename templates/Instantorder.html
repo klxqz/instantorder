@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="{$wa_url}wa-content/css/jquery-ui/jquery-ui-1.7.2.custom.css" />
+<script src="{$wa_app_static_url}plugins/instantorder/js/jquery-ui.min.js"></script>
+<style>
+    #instantorder_dialog{
+        display: none;
+    }
+</style>
+<script type='text/javascript'>
+            $(function() {
+            $('.instantorder_button').click(function() {
+            $('#instantorder_dialog').dialog({
+            title: '{$settings.title}',
+                    width: {$settings.width_modal},
+                    height: {$settings.height_modal},
+                    modal: true,
+                    autoOpen: true,
+            });
+            });
+            });
+</script>
+
+
+<div class="instantorder_block">
+    <a class="instantorder_button" href="javascript:void(0);">{$settings.link_name}</a>
+
+    <div id="instantorder_dialog">
+        <table  id="haggle_table">
+            {foreach from=$selected_fields item=selected_field}
+            <tr>
+                <td>{$selected_field.name}<span class="required">*</span>:</td>
+                <td><input id="haggle_url" type="text" name="{$selected_field.type}" /></td>
+            </tr>
+            {/foreach}
+        </table>
+
+    </div>
+</div>
+

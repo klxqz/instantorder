@@ -1,0 +1,168 @@
+<style>
+            
+    #instantorder_table{
+        margin-top: 10px;
+    }
+    #instantorder_table td{
+        padding: 5px 10px;
+    }
+     
+</style>
+<h1>Быстрый заказ</h1>
+
+<select class="all-fields" style="display:none;">
+    {foreach $fields as $field}
+    <option value="{$field->getId()}">{$field->getName()}</option>
+    {/foreach}
+    <optgroup label="Адрес">
+        {foreach from=$address_fields item=address}
+        <option value="address_{$address->getId()}">{$address->getName()}</option>
+        {/foreach}
+    </optgroup>
+</select>
+
+<div class="fields form">
+    <form action="?plugin=instantorder&action=save" method="post" id="plugins-settings-form">
+        {$wa->csrf()}
+
+
+        {literal}
+        <p>{shopInstantorderPlugin::display()} - Код хелпера вывода</p>
+        {/literal}
+        <p class="gray">
+            <i class="icon16 exclamation"></i>
+            Используя этот код Вы можете осуществить вывод "Пунктов выдачи" в любом месте вашей темы оформления, это позволяет избавиться от привязки к конкретным местам вывода плагина
+        </p>
+
+        <div class="field">
+            <div class="name">
+                Статус плагина
+            </div>
+            <div class="value">
+                <select name="shop_instantorder[status]">
+                    <option {if $settings.status == 1} selected="selected"{/if} value="1">Включен</option>
+                    <option {if $settings.status == 0} selected="selected"{/if} value="0">Выключен</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
+                Вывод в карточке товара
+            </div>
+            <div class="value">
+                <select name="shop_instantorder[frontend_product]">
+                    <option {if $settings.frontend_product == 1} selected="selected"{/if} value="1">Включен</option>
+                    <option {if $settings.frontend_product == 0} selected="selected"{/if} value="0">Выключен</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
+                Заголовок
+            </div>
+            <div class="value">
+                <input type="text" name="shop_instantorder[title]" value="{$settings.title|escape}"/>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
+                Название ссылки
+            </div>
+            <div class="value">
+                <input type="text" name="shop_instantorder[link_name]" value="{$settings.link_name|escape}"/>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
+                Ширина модального окна
+            </div>
+            <div class="value">
+                <input type="text" name="shop_instantorder[width_modal]" value="{$settings.width_modal|escape}"/>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
+                Высота модального окна
+            </div>
+            <div class="value">
+                <input type="text" name="shop_instantorder[height_modal]" value="{$settings.height_modal|escape}"/>
+            </div>
+        </div>
+        <br/>
+        <div>Поля формы быстрого оформления заказа:</div>
+        <div class="instantorder_container">
+            <table id="instantorder_table" border="1">
+                <tr>
+                    <td>Название</td><td>Тип</td><td>Обязательное поле</td><td>Удалить</td>
+                </tr>
+            
+            {foreach from=$selected_fields key=key item=selected_field}
+            <tr>
+                <td><input class="long" type="text" placeholder="Название" value="{$selected_field.name}" name="field_names[]"></td>
+                
+                <td>
+                <select name="field_vals[]">
+                    {foreach from=$fields item=field}
+                    <option {if $selected_field.type==$field->getId()}selected="selected"{/if} value="{$field->getId()}">{$field->getName()}</option>
+                    {/foreach}
+                    <optgroup label="Адрес">
+                    {foreach from=$address_fields item=address}
+                    <option {if $selected_field.type=="address_`$address->getId()`"}selected="selected"{/if} value="address_{$address->getId()}">{$address->getName()}</option>
+                    {/foreach}
+                    </optgroup>
+                </select>
+                </td>
+                <td>
+                    <select name="field_required[]">
+                        <option {if $selected_field.required}selected="selected"{/if} value="1">Да</option>
+                        <option {if !$selected_field.required}selected="selected"{/if} value="0">Нет</option>
+                    </select>
+                </td>
+                <td>
+                <a class="remove-field" href="javascript:void(0)"><i class="icon16 cross"></i></a>
+                </td>
+            </tr>
+            {/foreach}
+            </table>
+        </div>
+
+        <div class="field">
+            <a class="add-field" href="javascript:void(0)"><i class="icon16 add"></i>Добавить поле</a>
+        </div>
+
+
+        <div class="field">
+            <div class="value submit">
+                <input type="submit" class="button green" value="Сохранить">
+                <span id="plugins-settings-form-status" style="display:none">
+                    <i style="vertical-align:middle" class="icon16 yes"></i> [`Saved`]
+                </span>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    function initRemove() {
+        $('.remove-field').click(function() {
+            $(this).parent().parent().remove();
+        });
+    }
+    $(function() {
+        initRemove();
+        $('.add-field').click(function() {
+            $('#instantorder_table').append('<tr>\
+                <td><input class="long" type="text" placeholder="Название" value="" name="field_names[]"></td>\
+                <td><select name="field_vals[]">' + $('.all-fields').html() + '</select></td>\
+                <td><select name="field_required[]"><option value="1">Да</option><option value="0">Нет</option></select></td>\
+                <td><a class="remove-field" href="javascript:void(0)"><i class="icon16 cross"></i></a></td>\
+            </tr>');
+            initRemove();
+        });
+
+    });
+</script>

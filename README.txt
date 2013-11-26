@@ -1,17 +1,17 @@
-Плагин "Пункты выдачи" для Shop-Script 5
+Плагин "Быстрый заказ" для Shop-Script 5
 --------------------------
 Разработчик Коробов Николай wa-plugins.ru <support@wa-plugins.ru>
 
-Плагин выводит список пунктов выдачи для самовывоза товара.
+Плагин позволяет быстро оформить заказ.
 --------------------------
 Установка:
 
-   1) Скопируйте в каталог wa-apps/shop/plugins/ папку autocomplete/
+   1) Скопируйте в каталог wa-apps/shop/plugins/ папку instantorder/
     2) Добавьте запись в конфигурационный файл фреймворка wa-config/apps/shop/plugins.php:
-          'pointsissue' => true
+          'instantorder' => true
           Пример содержимого файла plugins.php:
             return array (
-                'pointsissue' => true
+                'instantorder' => true
             );
 --------------------------
 Использование:

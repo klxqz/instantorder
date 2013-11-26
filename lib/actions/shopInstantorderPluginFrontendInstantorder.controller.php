@@ -21,15 +21,22 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
 
         $instantorder_model = new shopInstantorderPluginModel();
         $selected_fields = $instantorder_model->getAll();
+        $address = array();
         foreach ($selected_fields as &$selected_field) {
-            if (preg_match("/address\.(.+)/", $selected_field['type'], $match)) {
-                //$contact->set('address', array('city'=>'dsds'));
-            } else {
-                $val = isset($fields[$selected_field['type']]) ? $fields[$selected_field['type']] : null;
-                $contact->set($selected_field['type'], $val);
+            $val = isset($fields[$selected_field['type']]) ? $fields[$selected_field['type']] : null;
+            if ($val) {
+                if (preg_match("/address\.(.+)/", $selected_field['type'], $match)) {
+                    $address[$match[1]] = $val;
+                } else {
+                    $contact->set($selected_field['type'], $val);
+                }
             }
         }
-
+        
+        if ($address) {
+            $contact->set('address.shipping', $address);
+            $contact->set('address.billing', $address);
+        }
 
         $data = array(
             'sku_id' => $sku_id,

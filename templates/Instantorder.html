@@ -7,6 +7,12 @@
     #instantorder_table{
         margin: 0 auto;
     }
+    .select_countries{
+        width: 180px;
+    }
+    #instantorder_table input[type=text]{
+        width: 200px;
+    }
 </style>
 <script type='text/javascript'>
             $(function() {
@@ -20,18 +26,36 @@
                     });
                 });
                 
-                $('#instantorder_form').submit(function(){
-                    $.ajax({
-                        type: 'POST',
-                        url: $(this).attr('action'),
-                        dataType: 'json',
-                        data: $(this).serialize() + '&' + $('#cart-form').serialize(),
-                        success: function(data, textStatus, jqXHR) {
-                            $('.response').html(data.data.message);
-                            $('.response').hide(5000);
-                        }
+                $('#instantorder_form').submit(function(event){
+                    event.preventDefault();
+                    var required = false;
+                    $('.required_field').each(function(){
+                        if(!$(this).val().length) {
+                            required = true;
+                            $(this).css('border', '2px solid red');
+                          }
                     });
-                    return false;
+                    if(required) {
+                        $('.response').html('Заполните обязательные поля');
+                        $('.response').css('color', 'red');
+                        $('.response').show();
+                        $('.response').hide(5000);
+                        setTimeout(function(){
+                            $('.required_field').css('border', '');
+                        },5000);
+                    } else {
+                        $.ajax({
+                            type: 'POST',
+                            url: $(this).attr('action'),
+                            dataType: 'json',
+                            data: $(this).serialize() + '&' + $('#cart-form').serialize(),
+                            success: function(data, textStatus, jqXHR) {
+                                $('.response').html(data.data.message);
+                                $('.response').show();
+                                $('.response').hide(5000);
+                            }
+                        });
+                    }
                 });                
                                 
                 
@@ -49,7 +73,18 @@
                 {foreach from=$selected_fields item=selected_field}
                 <tr>
                     <td>{$selected_field.name}{if $selected_field.required}<span class="required">*</span>{/if}:&nbsp;</td>
-                    <td><input type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" /></td>
+                    <td>
+                        {if $selected_field.type!='address.country'}
+                        <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
+                        {else}
+                        <select class="select_countries{if $selected_field.required} required_field{/if}" name="fields[{$selected_field.type}]" >
+                            <option value="">Выберите страну</option>
+                            {foreach from=$countries key=key item=country}
+                            <option value="{$key}"  {if isset($selected_field.def_value) && $selected_field.def_value==$key}selected="selected"{/if}>{$country.name}</option>
+                            {/foreach}
+                        </select>
+                        {/if}
+                    </td>
                 </tr>
                 {/foreach}
                 <tr>

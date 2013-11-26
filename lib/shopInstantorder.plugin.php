@@ -44,16 +44,24 @@ class shopInstantorderPlugin extends shopPlugin {
                     $field = $match[1];
                     $address = array_pop($contact_data['address']);
                     $selected_field['def_value'] = isset($address['data'][$field]) ? $address['data'][$field] : null;
+                    if ($field == 'region') {
+                        $region_model = new waRegionModel();
+                        $region = $region_model->getByField('code',$selected_field['def_value']);
+                        if($region) {
+                            $selected_field['def_value'] = $region['name'];
+                        }
+                    }
                 } else {
                     $selected_field['def_value'] = $contact->get($selected_field['type'], "default");
                 }
             }
         }
-
-
+        $country_model = new waCountryModel();
+        $countries = $country_model->all();
         $view = wa()->getView();
         $view->assign('settings', $plugin->getSettings());
         $view->assign('selected_fields', $selected_fields);
+        $view->assign('countries', $countries);
         $template_path = wa()->getAppPath('plugins/instantorder/templates/Instantorder.html', 'shop');
         $html = $view->fetch($template_path);
         return $html;

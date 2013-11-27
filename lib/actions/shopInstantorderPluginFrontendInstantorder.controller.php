@@ -32,7 +32,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
                 }
             }
         }
-        
+
         if ($address) {
             $contact->set('address.shipping', $address);
             $contact->set('address.billing', $address);
@@ -44,9 +44,11 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
             'quantity' => $quantity,
         );
         $this->addToCart($data);
-        $this->createOrder($contact);
-
-        $this->response['message'] = 'Заказ успешно отправлен';
+        $order_id = $this->createOrder($contact);
+        $plugin = wa()->getPlugin('instantorder');
+        $successful_order = $plugin->getSettings('successful_order');
+        $successful_order = str_replace('{order_id}', shopHelper::encodeOrderId($order_id), $successful_order);
+        $this->response['message'] = $successful_order;
     }
 
     protected function createOrder($contact) {
@@ -93,7 +95,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
         $workflow = new shopWorkflow();
         if ($order_id = $workflow->getActionById('create')->run($order)) {
             $cart->clear();
-            return true;
+            return $order_id;
         }
     }
 

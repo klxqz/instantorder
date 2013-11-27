@@ -11,7 +11,8 @@ class shopInstantorderPluginSettingsAction extends waViewAction {
     public function execute() {
         $app_settings_model = new waAppSettingsModel();
         $settings = $app_settings_model->get($this->plugin_id);
-        $fields = waContactFields::getAll();        
+        $fields = waContactFields::getAll(); 
+        unset($fields['address']);
         $address = waContactFields::get('address');
         $address = $address->getFields();
         $instantorder_model = new shopInstantorderPluginModel();

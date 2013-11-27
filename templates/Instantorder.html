@@ -13,6 +13,9 @@
     #instantorder_table input[type=text]{
         width: 200px;
     }
+    input.wa-captcha-input{
+        width: 140px !important;
+    }
 </style>
 <script type='text/javascript'>
             $(function() {
@@ -50,9 +53,17 @@
                             dataType: 'json',
                             data: $(this).serialize() + '&' + $('#cart-form').serialize(),
                             success: function(data, textStatus, jqXHR) {
-                                $('.response').html(data.data.message);
+                                if(data.status == 'ok') {
+                                    $('.response').css('color', 'green');
+                                    $('.response').html(data.data.message);
+                                    
+                                } else {
+                                    $('.response').css('color', 'red');
+                                    $('.response').html(data.errors);
+                                }
                                 $('.response').show();
-                                $('.response').hide(5000);
+                                $('.response').hide(10000);
+                                
                             }
                         });
                     }
@@ -87,6 +98,12 @@
                     </td>
                 </tr>
                 {/foreach}
+                <tr>
+                    <td colspan="2">
+                        {$wa->captcha(!empty($errors.captcha))}
+                        {if !empty($errors.captcha)}<em class="wa-error-msg">{$errors.captcha}</em>{/if}
+                    </td>
+                </tr>
                 <tr>
                     <td colspan="2" align="center" >
                         <input type="submit" value="Оформить заказ"/>

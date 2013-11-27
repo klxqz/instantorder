@@ -12,7 +12,7 @@
 
 <select class="all-fields" style="display:none;">
     {foreach $fields as $field}
-    <option value="{$field->getId()}">{$field->getName()}</option>
+    <option value="{$field->getId()}">{if $field->getId()=='name'}Полное имя{else}{$field->getName()}{/if}</option>
     {/foreach}
     <optgroup label="Адрес">
         {foreach from=$address_fields item=address}
@@ -93,6 +93,19 @@
                 <input type="text" name="shop_instantorder[height_modal]" value="{$settings.height_modal|escape}"/>
             </div>
         </div>
+        
+        
+        <div class="field">
+            <div class="name">
+                Сообщение при успешном заказе
+            </div>
+            <div class="value">
+                <textarea name="shop_instantorder[successful_order]">{$settings.successful_order|escape}</textarea>
+            </div>
+        </div>
+        
+        
+        
         <br/>
         <div>Поля формы быстрого оформления заказа:</div>
         <div class="instantorder_container">
@@ -108,7 +121,7 @@
                 <td>
                 <select name="field_vals[]">
                     {foreach from=$fields item=field}
-                    <option {if $selected_field.type==$field->getId()}selected="selected"{/if} value="{$field->getId()}">{$field->getName()}</option>
+                    <option {if $selected_field.type==$field->getId()}selected="selected"{/if} value="{$field->getId()}">{if $field->getId()=='name'}Полное имя{else}{$field->getName()}{/if}</option>
                     {/foreach}
                     <optgroup label="Адрес">
                     {foreach from=$address_fields item=address}

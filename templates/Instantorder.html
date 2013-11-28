@@ -6,6 +6,7 @@
     }
     #instantorder_table{
         margin: 0 auto;
+        width: 100%;
     }
     .select_countries{
         width: 180px;
@@ -42,9 +43,10 @@
                         $('.response').html('Заполните обязательные поля');
                         $('.response').css('color', 'red');
                         $('.response').show();
-                        $('.response').hide(5000);
+                        
                         setTimeout(function(){
                             $('.required_field').css('border', '');
+                            $('.response').hide();                            
                         },5000);
                     } else {
                         $.ajax({
@@ -62,7 +64,9 @@
                                     $('.response').html(data.errors);
                                 }
                                 $('.response').show();
-                                $('.response').hide(10000);
+                                setTimeout(function(){
+                                    $('.response').hide();                            
+                                },10000);
                                 
                             }
                         });
@@ -76,7 +80,7 @@
 
 
 <div class="instantorder_block">
-    <a class="instantorder_button" href="javascript:void(0);"><img src="{$wa_app_static_url}plugins/instantorder/img/instantorder_but.gif" title="{$settings.link_name}"/></a>
+    <a class="instantorder_button" href="javascript:void(0);"><img src="{$wa_app_static_url}plugins/instantorder/img/instantorder_but.gif" title="{$settings.link_name|escape}"/></a>
 
     <div id="instantorder_dialog">
         <form id="instantorder_form" action="{$wa_app_url}instantorder/">
@@ -98,12 +102,14 @@
                     </td>
                 </tr>
                 {/foreach}
+                {if $settings.is_captcha}
                 <tr>
                     <td colspan="2">
                         {$wa->captcha(!empty($errors.captcha))}
                         {if !empty($errors.captcha)}<em class="wa-error-msg">{$errors.captcha}</em>{/if}
                     </td>
                 </tr>
+                {/if}
                 <tr>
                     <td colspan="2" align="center" >
                         <input type="submit" value="Оформить заказ"/>

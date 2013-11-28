@@ -62,7 +62,12 @@ class shopInstantorderPlugin extends shopPlugin {
         $view->assign('settings', $plugin->getSettings());
         $view->assign('selected_fields', $selected_fields);
         $view->assign('countries', $countries);
-        $template_path = wa()->getAppPath('plugins/instantorder/templates/Instantorder.html', 'shop');
+        
+        $template_path = wa()->getDataPath('plugins/instantorder/templates/Instantorder.html', false, 'shop', true);
+        if(!file_exists($template_path)) {
+            $template_path =wa()->getAppPath('plugins/instantorder/templates/Instantorder.html',  'shop');
+        }
+        
         $html = $view->fetch($template_path);
         return $html;
     }

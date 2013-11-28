@@ -12,6 +12,11 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
         $product_id = waRequest::post('product_id');
         $quantity = waRequest::post('quantity');
         $sku_id = waRequest::post('sku_id');
+        
+        if ($plugin->getSettings('is_captcha') && !wa()->getCaptcha()->isValid()) {
+            $this->errors = _w('Invalid captcha code');
+            return false;
+        }
 
         if (wa()->getUser()->isAuth()) {
             $contact = wa()->getUser();

@@ -1,12 +1,18 @@
-<style>
-            
+<style type="text/css">            
     #instantorder_table{
         margin-top: 10px;
     }
     #instantorder_table td{
         padding: 5px 10px;
     }
-     
+    #wa .CodeMirror{
+        border: 1px solid #eee;
+    }
+    .CodeMirror-scroll {
+        height: auto;
+        overflow-y: hidden;
+        overflow-x: auto;
+    }
 </style>
 <h1>Быстрый заказ</h1>
 
@@ -101,12 +107,24 @@
             </div>
             <div class="value">
                 <textarea name="shop_instantorder[successful_order]">{$settings.successful_order|escape}</textarea>
+                <p class="hint">{ldelim}order_id{rdelim} - заменяется на номер заказа</p>
             </div>
         </div>
         
+        <div class="field">
+            <div class="name">
+                Использовать капчу (CAPTCHA)
+            </div>
+            <div class="value">
+                <select name="shop_instantorder[is_captcha]">
+                    <option {if $settings.is_captcha == 1} selected="selected"{/if} value="1">Да</option>
+                    <option {if $settings.is_captcha == 0} selected="selected"{/if} value="0">Нет</option>
+                </select>
+            </div>
+        </div>
         
-        
-        <br/>
+                
+        <br/><br/>
         <div>Поля формы быстрого оформления заказа:</div>
         <div class="instantorder_container">
             <table id="instantorder_table" border="1">
@@ -147,6 +165,23 @@
         <div class="field">
             <a class="add-field" href="javascript:void(0)"><i class="icon16 add"></i>Добавить поле</a>
         </div>
+        
+        
+        <div class="field">
+            <div class="name">Шаблон<br /><span class="hint">HTML + Smarty</span></div>
+            <div class="value no-shift">
+                <div id="s-editor-core-wrapper">
+                    <textarea id="sf-template" class="body" name="template">{$template}</textarea>
+                </div>
+            </div>
+
+            {if $change_tpl}
+            <div class="value">
+                <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
+                <input type="checkbox" name="reset_tpl" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+            </div>
+            {/if}
+        </div>
 
 
         <div class="field">
@@ -160,12 +195,13 @@
     </form>
 </div>
 <script type="text/javascript">
-    function initRemove() {
-        $('.remove-field').click(function() {
-            $(this).parent().parent().remove();
-        });
-    }
+    
     $(function() {
+        function initRemove() {
+            $('.remove-field').click(function() {
+                $(this).parent().parent().remove();
+            });
+        }
         initRemove();
         $('.add-field').click(function() {
             $('#instantorder_table').append('<tr>\
@@ -177,5 +213,47 @@
             initRemove();
         });
 
+    });
+
+    $(function () {
+        $('input[name="shop_productday[mode]"]').change(
+            function(){
+                if($(this).val()=='manual') {
+                    $('input[name="shop_productday[product_url]"]').removeAttr('disabled');
+                }
+                else {
+                    $('input[name="shop_productday[product_url]"]').attr('disabled',true);
+                }
+            }
+        );
+
+        var c = CodeMirror.fromTextArea(document.getElementById('sf-template'), {
+            mode: "text/html",
+            tabMode: "indent",
+            height: "dynamic",
+            lineWrapping: true
+        });
+        $("#sf-template").change(function() {
+            c.setValue($(this).val())
+        });
+        $("#sf-settings").submit(function () {
+            var f = $(this);
+            $.post(f.attr('action'), f.serialize(), function (response) {
+                if(response.status == 'ok') {
+                    $('#wa-design-button').removeClass('red').addClass('green');
+                    $("#wa-editor-status-fail").hide()
+                    $("#wa-editor-status-ok span").html(response.data.message);
+                    $("#wa-editor-status-ok").fadeIn('slow', function () {
+                        $(this).fadeOut(1000);
+                    });
+                } else {
+                    $('#wa-design-button').removeClass('green').addClass('red');
+                    $("#wa-editor-status-ok").hide();
+                    $("#wa-editor-status-fail span").html(response.errors.join(', '));
+                    $("#wa-editor-status-fail").fadeIn('slow');
+                }
+            }, "json")
+            return false;
+        });
     });
 </script>

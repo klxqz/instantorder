@@ -192,7 +192,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
                 }
             }
             // update shop cart session data
-            $shop_cart = new shopCart();
+
             wa()->getStorage()->remove('shop/cart');
             return true;
         } else {

@@ -22,11 +22,11 @@
             $(function() {
                 $('.instantorder_button').click(function() {
                     $('#instantorder_dialog').dialog({
-                    title: '{$settings.title}',
-                            width: {$settings.width_modal},
-                            height: {$settings.height_modal},
-                            modal: true,
-                            autoOpen: true,
+                        title: '{$settings.title|escape}',
+                        width: parseInt('{$settings.width_modal|escape}'),
+                        height: parseInt('{$settings.height_modal|escape}'),
+                        modal: true,
+                        autoOpen: true
                     });
                 });
                 

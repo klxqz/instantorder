@@ -19,63 +19,106 @@
     }
 </style>
 <script type='text/javascript'>
-            $(function() {
-                $('.instantorder_button').click(function() {
-                    $('#instantorder_dialog').dialog({
-                        title: '{$settings.title|escape}',
-                        width: parseInt('{$settings.width_modal|escape}'),
-                        height: parseInt('{$settings.height_modal|escape}'),
-                        modal: true,
-                        autoOpen: true
-                    });
-                });
-                
-                $('#instantorder_form').submit(function(event){
-                    event.preventDefault();
-                    var required = false;
-                    $('.required_field').each(function(){
-                        if(!$(this).val().length) {
-                            required = true;
-                            $(this).css('border', '2px solid red');
-                          }
-                    });
-                    if(required) {
-                        $('.response').html('Заполните обязательные поля');
-                        $('.response').css('color', 'red');
-                        $('.response').show();
-                        
-                        setTimeout(function(){
-                            $('.required_field').css('border', '');
-                            $('.response').hide();                            
-                        },5000);
-                    } else {
-                        $.ajax({
-                            type: 'POST',
-                            url: $(this).attr('action'),
-                            dataType: 'json',
-                            data: $(this).serialize() + '&' + $('#cart-form').serialize(),
-                            success: function(data, textStatus, jqXHR) {
-                                if(data.status == 'ok') {
-                                    $('.response').css('color', 'green');
-                                    $('.response').html(data.data.message);
-                                    
-                                } else {
-                                    $('.response').css('color', 'red');
-                                    $('.response').html(data.errors);
-                                }
-                                $('.response').show();
-                                setTimeout(function(){
-                                    $('.response').hide();                            
-                                },10000);
-                                
+    $(function() {
+
+        function load_regions() {
+            var country = $('.select_countries').val();
+            if(!country) {
+                return;
+            }
+            $('.region_block').append('<div id="instantorder-loading"><i class="icon16 loading"></i>[`Loading...`]</div>');
+            $.ajax({
+                type: 'POST',
+                url: '{$wa_app_url}instantorder/regions/',
+                dataType: 'json',
+                data: {
+                    'country': country
+                },
+                success: function(data, textStatus, jqXHR) {
+                    if (data.status == 'ok') {
+                        if (Object.keys(data.data.options).length) {
+                            $('.region_block select.select_region').html('<option value="">Выберите регион</option>');
+                            for (key in data.data.options) {
+                                $('.region_block select.select_region').append('<option value="' + key + '">' + data.data.options[key] + '</option>');
                             }
-                        });
+                            $(".region_block input").prop('disabled', true);
+                            $('.region_block input').hide();
+                            $(".region_block select.select_region").prop('disabled', false);
+                            $('.region_block select.select_region').show();
+                        } else {
+                            $(".region_block select.select_region").prop('disabled', true);
+                            $('.region_block select.select_region').hide();
+                            $(".region_block input").prop('disabled', false);
+                            $('.region_block input').show();
+                        }
+
                     }
-                });                
-                                
-                
-                
+                    $('#instantorder-loading').remove();
+                }
             });
+        }
+
+        if ($('input[name="fields[address.region]"]')) {
+            load_regions();
+            $('.select_countries').change(load_regions);
+        }
+
+        $('.instantorder_button').click(function() {
+            $('#instantorder_dialog').dialog({
+                title: '{$settings.title|escape}',
+                width: parseInt('{$settings.width_modal|escape}'),
+                height: parseInt('{$settings.height_modal|escape}'),
+                modal: true,
+                autoOpen: true
+            });
+        });
+
+        $('#instantorder_form').submit(function(event) {
+            event.preventDefault();
+            var required = false;
+            $('#instantorder_form .required_field').each(function() {
+                if ($(this).prop('disabled')==false && !$(this).val().length) {
+                    required = true;
+                    $(this).css('border', '2px solid red');
+                }
+            });
+            if (required) {
+                $('.response').html('Заполните обязательные поля');
+                $('.response').css('color', 'red');
+                $('.response').show();
+
+                setTimeout(function() {
+                    $('.required_field').css('border', '');
+                    $('.response').hide();
+                }, 5000);
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    dataType: 'json',
+                    data: $(this).serialize() + '&' + $('#cart-form').serialize(),
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == 'ok') {
+                            $('.response').css('color', 'green');
+                            $('.response').html(data.data.message);
+
+                        } else {
+                            $('.response').css('color', 'red');
+                            $('.response').html(data.errors);
+                        }
+                        $('.response').show();
+                        setTimeout(function() {
+                            $('.response').hide();
+                        }, 10000);
+
+                    }
+                });
+            }
+        });
+
+
+
+    });
 </script>
 
 
@@ -89,16 +132,23 @@
                 <tr>
                     <td>{$selected_field.name}{if $selected_field.required}<span class="required">*</span>{/if}:&nbsp;</td>
                     <td>
-                        {if $selected_field.type!='address.country'}
-                        <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
-                        {else}
+                        {if $selected_field.type=='address.country'}
                         <select class="select_countries{if $selected_field.required} required_field{/if}" name="fields[{$selected_field.type}]" >
                             <option value="">Выберите страну</option>
                             {foreach from=$countries key=key item=country}
                             <option value="{$key}"  {if isset($selected_field.def_value) && $selected_field.def_value==$key}selected="selected"{/if}>{$country.name}</option>
                             {/foreach}
                         </select>
-                        {/if}
+                        {elseif $selected_field.type=='address.region'}
+                        <div class="region_block">
+                            <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
+                                <select style="display:none;" disabled="disabled" class="select_region{if $selected_field.required} required_field{/if}" name="fields[{$selected_field.type}]" >
+                                <option value="">Выберите регион</option>
+                            </select>
+                        </div>
+                        {else}
+                        <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
+                            {/if}
                     </td>
                 </tr>
                 {/foreach}
@@ -118,7 +168,7 @@
 
                 <tr>
                     <td colspan="2" align="center" class="response" >
-                        
+
                     </td>
                 </tr>
             </table>

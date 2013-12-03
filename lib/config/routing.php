@@ -5,5 +5,6 @@
  * @link http://wa-plugins.ru/
  */
 return array(
-    'instantorder/' => 'frontend/instantorder'
+    'instantorder/' => 'frontend/instantorder',
+    'instantorder/regions/' => 'frontend/regions',
 );

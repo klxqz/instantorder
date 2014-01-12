@@ -1,130 +1,27 @@
 <link rel="stylesheet" href="{$wa_url}wa-content/css/jquery-ui/jquery-ui-1.7.2.custom.css" />
+<link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/themes/{$settings.theme}/jquery.ui.theme.css">
 <script src="{$wa_app_static_url}plugins/instantorder/js/jquery-ui.min.js"></script>
-<style>
-    #instantorder_dialog{
-        display: none;
-    }
-    #instantorder_table{
-        margin: 0 auto;
-        width: 100%;
-    }
-    .select_countries{
-        width: 180px;
-    }
-    #instantorder_table input[type=text]{
-        width: 200px;
-    }
-    input.wa-captcha-input{
-        width: 140px !important;
-    }
-</style>
+<link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/style.css" />
 <script type='text/javascript'>
-    $(function() {
-
-        function load_regions() {
-            var country = $('.select_countries').val();
-            if(!country) {
-                return;
-            }
-            $('.region_block').append('<div id="instantorder-loading"><i class="icon16 loading"></i>[`Loading...`]</div>');
-            $.ajax({
-                type: 'POST',
-                url: '{$wa_app_url}instantorder/regions/',
-                dataType: 'json',
-                data: {
-                    'country': country
-                },
-                success: function(data, textStatus, jqXHR) {
-                    if (data.status == 'ok') {
-                        if (Object.keys(data.data.options).length) {
-                            $('.region_block select.select_region').html('<option value="">Выберите регион</option>');
-                            for (key in data.data.options) {
-                                $('.region_block select.select_region').append('<option value="' + key + '">' + data.data.options[key] + '</option>');
-                            }
-                            $(".region_block input").prop('disabled', true);
-                            $('.region_block input').hide();
-                            $(".region_block select.select_region").prop('disabled', false);
-                            $('.region_block select.select_region').show();
-                        } else {
-                            $(".region_block select.select_region").prop('disabled', true);
-                            $('.region_block select.select_region').hide();
-                            $(".region_block input").prop('disabled', false);
-                            $('.region_block input').show();
-                        }
-
-                    }
-                    $('#instantorder-loading').remove();
-                }
-            });
-        }
-
-        if ($('input[name="fields[address.region]"]')) {
-            load_regions();
-            $('.select_countries').change(load_regions);
-        }
-
-        $('.instantorder_button').click(function() {
-            $('#instantorder_dialog').dialog({
-                title: '{$settings.title|escape}',
-                width: parseInt('{$settings.width_modal|escape}'),
-                height: parseInt('{$settings.height_modal|escape}'),
-                modal: true,
-                autoOpen: true
-            });
-        });
-
-        $('#instantorder_form').submit(function(event) {
-            event.preventDefault();
-            var required = false;
-            $('#instantorder_form .required_field').each(function() {
-                if ($(this).prop('disabled')==false && !$(this).val().length) {
-                    required = true;
-                    $(this).css('border', '2px solid red');
-                }
-            });
-            if (required) {
-                $('.response').html('Заполните обязательные поля');
-                $('.response').css('color', 'red');
-                $('.response').show();
-
-                setTimeout(function() {
-                    $('.required_field').css('border', '');
-                    $('.response').hide();
-                }, 5000);
-            } else {
-                $.ajax({
-                    type: 'POST',
-                    url: $(this).attr('action'),
-                    dataType: 'json',
-                    data: $(this).serialize() + '&' + $('#cart-form').serialize(),
-                    success: function(data, textStatus, jqXHR) {
-                        if (data.status == 'ok') {
-                            $('.response').css('color', 'green');
-                            $('.response').html(data.data.message);
-
-                        } else {
-                            $('.response').css('color', 'red');
-                            $('.response').html(data.errors);
-                        }
-                        $('.response').show();
-                        setTimeout(function() {
-                            $('.response').hide();
-                        }, 10000);
-
-                    }
-                });
-            }
-        });
-
-
-
-    });
+    var $wa_app_url = '{$wa_app_url}';
+    var instantorder_draggable = {if $settings.draggable}true{else}false{/if};
+    var instantorder_resizable = {if $settings.resizable}true{else}false{/if};
+    var instantorder_title = '{$settings.title|escape}';
+    var instantorder_width = parseInt('{$settings.width_modal|escape}');
+    var instantorder_height = parseInt('{$settings.height_modal|escape}');
 </script>
-
+<script src="{$wa_app_static_url}plugins/instantorder/js/script.js"></script>
 
 <div class="instantorder_block">
-    <a class="instantorder_button" href="javascript:void(0);"><img src="{$wa_app_static_url}plugins/instantorder/img/instantorder_but.gif" title="{$settings.link_name|escape}"/></a>
-
+    {if !isset($product) || count($product.skus) > 1}
+        {$product_available = true}
+    {else}
+        {$sku = $product.skus[$product.sku_id]}
+        {$product_available = $product.status && $sku.available && ($wa->shop->settings('ignore_stock_count') || $sku.count === null || $sku.count > 0)}
+    {/if}
+    {if $product_available}
+    <a class="instantorder_button" href="#">{$settings.link_name|escape}</a>
+    {/if}
     <div id="instantorder_dialog">
         <form id="instantorder_form" action="{$wa_app_url}instantorder/">
             <table  id="instantorder_table">
@@ -148,10 +45,19 @@
                         </div>
                         {else}
                         <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
-                            {/if}
+                        {/if}
                     </td>
                 </tr>
                 {/foreach}
+                
+                {if $settings.is_comment}
+                <tr>
+                    <td>Комментарий к заказу:</td>
+                    <td>
+                        <textarea name="comment"></textarea>                        
+                    </td>
+                </tr>
+                {/if}
                 {if $settings.is_captcha}
                 <tr>
                     <td colspan="2">

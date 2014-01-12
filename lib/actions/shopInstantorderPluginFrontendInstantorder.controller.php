@@ -9,6 +9,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
     public function execute() {
         $plugin = wa()->getPlugin('instantorder');
         $fields = waRequest::post('fields', array());
+        $comment = waRequest::post('comment');
         $product_id = waRequest::post('product_id');
         $quantity = waRequest::post('quantity', 1);
         $sku_id = waRequest::post('sku_id');
@@ -49,14 +50,16 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
             'quantity' => $quantity,
         );
         $this->addToCart($data);
-        $order_id = $this->createOrder($contact);
+        $order_id = $this->createOrder($contact, $comment);
         $plugin = wa()->getPlugin('instantorder');
         $successful_order = $plugin->getSettings('successful_order');
+        $successful_order_js = $plugin->getSettings('successful_order_js');
         $successful_order = str_replace('{order_id}', shopHelper::encodeOrderId($order_id), $successful_order);
-        $this->response['message'] = $successful_order;
+        $this->response['message'] = $successful_order . '<script>' . $successful_order_js . '</script>';
+        waSystem::popActivePlugin();
     }
 
-    protected function createOrder($contact) {
+    protected function createOrder($contact, $comment = '') {
         $cart = new shopCart();
         $items = $cart->items(false);
         // remove id from item
@@ -96,6 +99,9 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
         $order['shipping'] = 0;
 
         $order['comment'] = 'Заказ создан через форму "Быстрый заказ"';
+        if ($comment) {
+            $order['comment'] .= "\r\nКомментарий покупателя: " . $comment;
+        }
 
         $workflow = new shopWorkflow();
         if ($order_id = $workflow->getActionById('create')->run($order)) {

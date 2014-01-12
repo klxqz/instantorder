@@ -54,12 +54,24 @@
 
         <div class="field">
             <div class="name">
-                Вывод в карточке товара
+                Стандартный вывод в карточке товара
             </div>
             <div class="value">
                 <select name="shop_instantorder[frontend_product]">
                     <option {if $settings.frontend_product == 1} selected="selected"{/if} value="1">Включен</option>
                     <option {if $settings.frontend_product == 0} selected="selected"{/if} value="0">Выключен</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="field">
+            <div class="name">
+                Стандартный вывод в корзине
+            </div>
+            <div class="value">
+                <select name="shop_instantorder[frontend_cart]">
+                    <option {if $settings.frontend_cart == 1} selected="selected"{/if} value="1">Включен</option>
+                    <option {if $settings.frontend_cart == 0} selected="selected"{/if} value="0">Выключен</option>
                 </select>
             </div>
         </div>
@@ -84,6 +96,19 @@
 
         <div class="field">
             <div class="name">
+                Тема оформления
+            </div>
+            <div class="value">
+                <select name="shop_instantorder[theme]">
+                    {foreach from=$themes item=theme}
+                    <option {if $settings.theme == $theme} selected="selected"{/if}  value="{$theme}">{$theme}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
                 Ширина модального окна
             </div>
             <div class="value">
@@ -99,8 +124,30 @@
                 <input type="text" name="shop_instantorder[height_modal]" value="{$settings.height_modal|escape}"/>
             </div>
         </div>
-        
-        
+
+        <div class="field">
+            <div class="name">
+                Изменение размеров модального окна
+            </div>
+            <div class="value">
+                <select name="shop_instantorder[resizable]">
+                    <option {if $settings.resizable == 1} selected="selected"{/if} value="1">Да</option>
+                    <option {if $settings.resizable == 0} selected="selected"{/if} value="0">Нет</option>
+                </select>
+            </div>
+        </div>
+        <div class="field">
+            <div class="name">
+                Перемещение модального окна
+            </div>
+            <div class="value">
+                <select name="shop_instantorder[draggable]">
+                    <option {if $settings.draggable == 1} selected="selected"{/if} value="1">Да</option>
+                    <option {if $settings.draggable == 0} selected="selected"{/if} value="0">Нет</option>
+                </select>
+            </div>
+        </div>
+
         <div class="field">
             <div class="name">
                 Сообщение при успешном заказе
@@ -113,6 +160,16 @@
         
         <div class="field">
             <div class="name">
+                JavaScript-код, выполняемый после успешного заказа
+            </div>
+            <div class="value">
+                <textarea name="shop_instantorder[successful_order_js]">{$settings.successful_order_js|escape}</textarea>
+                <p class="hint">Этот код может быть использован для отслеживания целей в яндекс или google аналитике</p>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
                 Использовать капчу (CAPTCHA)
             </div>
             <div class="value">
@@ -123,7 +180,19 @@
             </div>
         </div>
         
-                
+        <div class="field">
+            <div class="name">
+                Выводить поле комментария заказа
+            </div>
+            <div class="value">
+                <select name="shop_instantorder[is_comment]">
+                    <option {if $settings.is_comment == 1} selected="selected"{/if} value="1">Да</option>
+                    <option {if $settings.is_comment == 0} selected="selected"{/if} value="0">Нет</option>
+                </select>
+            </div>
+        </div>
+
+
         <br/><br/>
         <div>Поля формы быстрого оформления заказа:</div>
         <div class="instantorder_container">
@@ -131,47 +200,47 @@
                 <tr>
                     <td>Название</td><td>Тип</td><td>Обязательное поле</td><td>Удалить</td>
                 </tr>
-            
-            {foreach from=$selected_fields key=key item=selected_field}
-            <tr>
-                <td><input class="long" type="text" placeholder="Название" value="{$selected_field.name}" name="field_names[]"></td>
-                
-                <td>
-                <select name="field_vals[]">
-                    {foreach from=$fields item=field}
-                    <option {if $selected_field.type==$field->getId()}selected="selected"{/if} value="{$field->getId()}">{if $field->getId()=='name'}Полное имя{else}{$field->getName()}{/if}</option>
-                    {/foreach}
-                    <optgroup label="Адрес">
-                    {foreach from=$address_fields item=address}
-                    <option {if $selected_field.type=="address.`$address->getId()`"}selected="selected"{/if} value="address.{$address->getId()}">{$address->getName()}</option>
-                    {/foreach}
-                    </optgroup>
-                </select>
-                </td>
-                <td>
-                    <select name="field_required[]">
-                        <option {if $selected_field.required}selected="selected"{/if} value="1">Да</option>
-                        <option {if !$selected_field.required}selected="selected"{/if} value="0">Нет</option>
-                    </select>
-                </td>
-                <td>
-                <a class="remove-field" href="javascript:void(0)"><i class="icon16 cross"></i></a>
-                </td>
-            </tr>
-            {/foreach}
+
+                {foreach from=$selected_fields key=key item=selected_field}
+                <tr>
+                    <td><input class="long" type="text" placeholder="Название" value="{$selected_field.name|escape}" name="field_names[]"></td>
+
+                    <td>
+                        <select name="field_vals[]">
+                            {foreach from=$fields item=field}
+                            <option {if $selected_field.type==$field->getId()}selected="selected"{/if} value="{$field->getId()}">{if $field->getId()=='name'}Полное имя{else}{$field->getName()}{/if}</option>
+                            {/foreach}
+                            <optgroup label="Адрес">
+                                {foreach from=$address_fields item=address}
+                                <option {if $selected_field.type=="address.`$address->getId()`"}selected="selected"{/if} value="address.{$address->getId()}">{$address->getName()}</option>
+                                {/foreach}
+                            </optgroup>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="field_required[]">
+                            <option {if $selected_field.required}selected="selected"{/if} value="1">Да</option>
+                            <option {if !$selected_field.required}selected="selected"{/if} value="0">Нет</option>
+                        </select>
+                    </td>
+                    <td>
+                        <a class="remove-field" href="javascript:void(0)"><i class="icon16 cross"></i></a>
+                    </td>
+                </tr>
+                {/foreach}
             </table>
         </div>
 
         <div class="field">
             <a class="add-field" href="javascript:void(0)"><i class="icon16 add"></i>Добавить поле</a>
         </div>
-        
-        
+
+
         <div class="field">
             <div class="name">Шаблон<br /><span class="hint">HTML + Smarty</span></div>
             <div class="value no-shift">
                 <div id="s-editor-core-wrapper">
-                    <textarea id="sf-template" class="body" name="template">{$template}</textarea>
+                    <textarea id="sf-template" class="body" name="template">{$template|escape}</textarea>
                 </div>
             </div>
 
@@ -195,7 +264,7 @@
     </form>
 </div>
 <script type="text/javascript">
-    
+
     $(function() {
         function initRemove() {
             $('.remove-field').click(function() {
@@ -215,7 +284,7 @@
 
     });
 
-    $(function () {
+    $(function() {
 
 
         var c = CodeMirror.fromTextArea(document.getElementById('sf-template'), {
@@ -227,14 +296,14 @@
         $("#sf-template").change(function() {
             c.setValue($(this).val());
         });
-        $("#sf-settings").submit(function () {
+        $("#sf-settings").submit(function() {
             var f = $(this);
-            $.post(f.attr('action'), f.serialize(), function (response) {
-                if(response.status == 'ok') {
+            $.post(f.attr('action'), f.serialize(), function(response) {
+                if (response.status == 'ok') {
                     $('#wa-design-button').removeClass('red').addClass('green');
                     $("#wa-editor-status-fail").hide()
                     $("#wa-editor-status-ok span").html(response.data.message);
-                    $("#wa-editor-status-ok").fadeIn('slow', function () {
+                    $("#wa-editor-status-ok").fadeIn('slow', function() {
                         $(this).fadeOut(1000);
                     });
                 } else {

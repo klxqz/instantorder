@@ -14,4 +14,9 @@ $app_settings_model->set($plugin_id, 'width_modal', '320');
 $app_settings_model->set($plugin_id, 'height_modal', '240');
 $app_settings_model->set($plugin_id, 'successful_order', 'Заказ был успешно создан. Номер Вашего заказа {order_id}. В ближайшее время оператор свяжется с Вами.');
 $app_settings_model->set($plugin_id, 'is_captcha', '1');
-
+$app_settings_model->set($plugin_id, 'frontend_cart', '1');
+$app_settings_model->set($plugin_id, 'theme', 'base');
+$app_settings_model->set($plugin_id, 'resizable', '1');
+$app_settings_model->set($plugin_id, 'draggable', '1');
+$app_settings_model->set($plugin_id, 'successful_order_js', '');
+$app_settings_model->set($plugin_id, 'is_comment', '1');

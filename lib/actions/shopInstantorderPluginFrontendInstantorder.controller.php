@@ -1,69 +1,83 @@
 <?php
 
 /**
- * @author Коробов Николай wa-plugins.ru <support@wa-plugins.ru>
+ * @author  wa-plugins.ru <support@wa-plugins.ru>
  * @link http://wa-plugins.ru/
  */
 class shopInstantorderPluginFrontendInstantorderController extends waJsonController {
 
     public function execute() {
-        $plugin = wa()->getPlugin('instantorder');
-        $fields = waRequest::post('fields', array());
-        $comment = waRequest::post('comment');
-        $product_id = waRequest::post('product_id');
-        $quantity = waRequest::post('quantity', 1);
-        $sku_id = waRequest::post('sku_id');
-        $features = waRequest::post('features', array());
+        try {
+            $plugin = wa()->getPlugin('instantorder');
+            $fields = waRequest::post('fields', array());
+            $comment = waRequest::post('comment');
+            $product_id = waRequest::post('product_id');
+            $quantity = waRequest::post('quantity', 1);
+            $sku_id = waRequest::post('sku_id');
+            $features = waRequest::post('features', array());
 
-        if ($plugin->getSettings('is_captcha') && !wa()->getCaptcha()->isValid()) {
-            $this->errors = _w('Invalid captcha code');
-            return false;
-        }
+            if ($plugin->getSettings('is_captcha') && !wa()->getCaptcha()->isValid()) {
+                $this->errors = _w('Invalid captcha code');
+                return false;
+            }
 
-        if (wa()->getUser()->isAuth()) {
-            $contact = wa()->getUser();
-        } else {
-            $contact = new waContact();
-        }
+            if (wa()->getUser()->isAuth()) {
+                $contact = wa()->getUser();
+            } else {
+                $contact = new waContact();
+            }
 
-        $instantorder_model = new shopInstantorderPluginModel();
-        $selected_fields = $instantorder_model->getAll();
-        $address = array();
-        foreach ($selected_fields as &$selected_field) {
-            $val = isset($fields[$selected_field['type']]) ? $fields[$selected_field['type']] : null;
-            if ($val) {
-                if (preg_match("/address\.(.+)/", $selected_field['type'], $match)) {
-                    $address[$match[1]] = $val;
-                } else {
-                    $contact->set($selected_field['type'], $val);
+            $instantorder_model = new shopInstantorderPluginModel();
+            $selected_fields = $instantorder_model->getAll();
+            $address = array();
+            foreach ($selected_fields as &$selected_field) {
+                $val = isset($fields[$selected_field['type']]) ? $fields[$selected_field['type']] : null;
+                if ($val) {
+                    if (preg_match("/address\.(.+)/", $selected_field['type'], $match)) {
+                        $address[$match[1]] = $val;
+                    } else {
+                        $contact->set($selected_field['type'], $val);
+                    }
                 }
             }
-        }
 
-        if ($address) {
-            $contact->set('address.shipping', $address);
-            $contact->set('address.billing', $address);
-        }
+            if ($address) {
+                $contact->set('address.shipping', $address);
+                $contact->set('address.billing', $address);
+            }
 
-        $data = array(
-            'features' => $features,
-            'sku_id' => $sku_id,
-            'product_id' => $product_id,
-            'quantity' => $quantity,
-        );
-        $this->addToCart($data);
-        $order_id = $this->createOrder($contact, $comment);
-        $plugin = wa()->getPlugin('instantorder');
-        $successful_order = $plugin->getSettings('successful_order');
-        $successful_order_js = $plugin->getSettings('successful_order_js');
-        $successful_order = str_replace('{order_id}', shopHelper::encodeOrderId($order_id), $successful_order);
-        $this->response['message'] = $successful_order . '<script>' . $successful_order_js . '</script>';
-        waSystem::popActivePlugin();
+            if ($product_id || $sku_id) {
+                $data = array(
+                    'features' => $features,
+                    'sku_id' => $sku_id,
+                    'product_id' => $product_id,
+                    'quantity' => $quantity,
+                );
+                $this->addToCart($data);
+            }
+
+            $order_id = $this->createOrder($contact, $comment);
+            $plugin = wa()->getPlugin('instantorder');
+            $successful_order = $plugin->getSettings('successful_order');
+            $successful_order_js = $plugin->getSettings('successful_order_js');
+            $successful_order = str_replace('{order_id}', shopHelper::encodeOrderId($order_id), $successful_order);
+            $this->response['message'] = $successful_order . '<script>' . $successful_order_js . '</script>';
+            waSystem::popActivePlugin();
+        } catch (Exception $ex) {
+            $this->errors = $ex->getMessage();
+        }
     }
 
     protected function createOrder($contact, $comment = '') {
         $cart = new shopCart();
         $items = $cart->items(false);
+        if (!$items) {
+            throw new waException("Нет доступного товара для заказа");
+        }
+        if (!$cart->total(false)) {
+            throw new waException("Неверная сумма заказа");
+        }
+
         // remove id from item
         foreach ($items as &$item) {
             unset($item['id']);
@@ -146,6 +160,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
                     }
 
                     if (!$sku) {
+                        throw new waException("Товар не найден");
                         return false;
                     }
                 }
@@ -160,11 +175,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
                 $c = $cart_model->countSku($code, $sku['id']);
                 if ($sku['count'] !== null && $c + $quantity > $sku['count']) {
                     $quantity = $sku['count'] - $c;
-                    if (!$quantity) {
-                        return false;
-                    } else {
-                        return false;
-                    }
+                    throw new waException("Недопустимое количество товара на складе");
                 }
             }
             $services = array();
@@ -204,6 +215,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
             wa()->getStorage()->remove('shop/cart');
             return true;
         } else {
+            throw new waException("Товар не найден");
             return false;
         }
     }

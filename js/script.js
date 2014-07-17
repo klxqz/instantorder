@@ -1,5 +1,55 @@
-    $(function() {
-        function load_regions() {
+(function($) {
+    "use strict";
+    $.instantorder = {
+        options: {},
+        init: function(options) {
+            var that = this;
+            that.options = options;
+            this.initInstantorder();
+
+        },
+        initInstantorder: function() {
+            var that = this;
+            $('#instantorder_dialog').appendTo('body');
+            $('#instantorder_dialog').append('<form id="instantorder_form"></form>');
+            $('#instantorder_dialog > table').appendTo('#instantorder_form');
+
+            $('#instantorder_dialog').dialog({
+                draggable: that.options.instantorder_draggable,
+                resizable: that.options.instantorder_resizable,
+                title: that.options.instantorder_title,
+                width: that.options.instantorder_width,
+                height: that.options.instantorder_height,
+                modal: true,
+                autoOpen: false
+            });
+
+            $('.instantorder_button').click(function() {
+                $('#instantorder_dialog').dialog('open');
+                $('#instantorder_dialog').find('input[type=submit]').removeAttr('disabled');
+                return false;
+            });
+
+            this.initSubmitForm();
+            this.initLoadRegions();
+
+
+        },
+        initLoadRegions: function() {
+            var that = this;
+            if ($('#instantorder_form input[name="fields[address.region]"]')) {
+                this.loadRegions();
+                $('.select_countries').change(function() {
+                    that.loadRegions(that.options.$wa_app_url);
+                });
+            }
+        },
+        loadRegions: function($wa_app_url) {
+            var that = this;
+            if (that.options.$wa_app_url === undefined) {
+                that.options.$wa_app_url = $wa_app_url;
+            }
+
             var country = $('.select_countries').val();
             if (!country) {
                 return;
@@ -7,7 +57,7 @@
             $('.region_block').append('<div id="instantorder-loading"><i class="icon16 loading"></i>Загрузка</div>');
             $.ajax({
                 type: 'POST',
-                url: $wa_app_url+'instantorder/regions/',
+                url: that.options.$wa_app_url + 'instantorder/regions/',
                 dataType: 'json',
                 data: {
                     'country': country
@@ -16,6 +66,7 @@
                     if (data.status == 'ok') {
                         if (Object.keys(data.data.options).length) {
                             $('.region_block select.select_region').html('<option value="">Выберите регион</option>');
+                            var key = null;
                             for (key in data.data.options) {
                                 $('.region_block select.select_region').append('<option value="' + key + '">' + data.data.options[key] + '</option>');
                             }
@@ -34,95 +85,51 @@
                     $('#instantorder-loading').remove();
                 }
             });
-        }
-
-        if ($('input[name="fields[address.region]"]')) {
-            load_regions();
-            $('.select_countries').change(load_regions);
-        }
-        $('#instantorder_dialog').dialog({
-            draggable: instantorder_draggable,
-            resizable: instantorder_resizable,
-            title: instantorder_title,
-            width: instantorder_width,
-            height: instantorder_height,
-            modal: true,
-            autoOpen: false
-        });
-
-        $('.instantorder_button').click(function() {
-            $('#instantorder_dialog').dialog('open');
-            return false;
-        });
-
-        $('#instantorder_form').submit(function(event) {
-            event.preventDefault();
-            var required = false;
-            $('#instantorder_form .required_field').each(function() {
-                if ($(this).prop('disabled') == false && !$(this).val().length) {
-                    required = true;
-                    $(this).css('border', '2px solid red');
-                }
-            });
-            if (required) {
-                $('.response').html('Заполните обязательные поля');
-                $('.response').css('color', 'red');
-                $('.response').show();
-
-                setTimeout(function() {
-                    $('.required_field').css('border', '');
-                    $('.response').hide();
-                }, 5000);
-            } else {
-                $.ajax({
-                    type: 'POST',
-                    url: $(this).attr('action'),
-                    dataType: 'json',
-                    data: $(this).serialize() + '&' + $('#cart-form').serialize(),
-                    success: function(data, textStatus, jqXHR) {
-                        if (data.status == 'ok') {
-                            $('.response').css('color', 'green');
-                            $('.response').html(data.data.message);
-
-                        } else {
-                            $('.response').css('color', 'red');
-                            $('.response').html(data.errors);
-                        }
-                        $('.response').show();
-                        setTimeout(function() {
-                            $('.response').hide();
-                        }, 10000);
-
+        },
+        initSubmitForm: function() {
+            var that = this;
+            $('#instantorder_form').submit(function(event) {
+                event.preventDefault();
+                var required = false;
+                $(this).find('.required_field').each(function() {
+                    if ($(this).prop('disabled') == false && !$(this).val().length) {
+                        required = true;
+                        $(this).css('border', '2px solid red');
                     }
                 });
-            }
-        });
-        
-        $('#product-skus input[type="radio"]').click(function(){        
-                if ($(this).data('disabled') == 1) {
-                    $('.instantorder_button').hide();
-                } else {
-                    $('.instantorder_button').show();
-                }
-        });
-        $("#product-skus input[type=radio]:checked").click();
-        $("select.sku-feature").change(function () {
-            var key = "";
-            $("select.sku-feature").each(function () {
-                key += $(this).data('feature-id') + ':' + $(this).val() + ';';
-            });
-            var sku = sku_features[key];
-            if (sku) {
-                if (sku.available) {
-                    $('.instantorder_button').show();
-                } else {
-                    $('.instantorder_button').hide();
-                }
-                $(".add2cart .price").data('price', sku.price);
-            } else {
-                $('.instantorder_button').hide();
-            }
-        });
-        $("select.sku-feature:first").change();
+                if (required) {
+                    $('.response').html('Заполните обязательные поля');
+                    $('.response').css('color', 'red');
+                    $('.response').show();
 
-    });
+                    setTimeout(function() {
+                        $('.required_field').css('border', '');
+                        $('.response').hide();
+                    }, 5000);
+                } else {
+                    $(this).find('input[type=submit]').attr('disabled', true);
+                    $.ajax({
+                        type: 'POST',
+                        url: that.options.$wa_app_url + 'instantorder/',
+                        dataType: 'json',
+                        data: $(this).serialize() + '&' + $('#cart-form').serialize(),
+                        success: function(data, textStatus, jqXHR) {
+                            if (data.status == 'ok') {
+                                $('.response').css('color', 'green');
+                                $('.response').html(data.data.message);
+
+                            } else {
+                                $('.response').css('color', 'red');
+                                $('.response').html(data.errors);
+                            }
+                            $('.response').show();
+                            setTimeout(function() {
+                                $('.response').hide();
+                            }, 10000);
+                        }
+                    });
+                }
+            });
+        }
+    };
+})(jQuery);

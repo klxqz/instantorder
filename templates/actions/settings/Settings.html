@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/gradient.css">
 <style type="text/css">            
     #instantorder_table{
         margin-top: 10px;
@@ -13,16 +14,33 @@
         overflow-y: hidden;
         overflow-x: auto;
     }
+    #css_gradients div {
+        cursor: pointer;
+        height: 50px;
+        width: 50px;
+    }
+    #css_gradients span{
+        display: inline-block;
+    }
+    #css_gradients span.active{
+        border: 1px solid orange;
+    }
+    .colorpicker{
+        z-index: 10;
+    }
+    .templates-block{
+        display: none;
+    }
 </style>
 <h1>Быстрый заказ</h1>
 
 <select class="all-fields" style="display:none;">
     {foreach $fields as $field}
-    <option value="{$field->getId()}">{if $field->getId()=='name'}Полное имя{else}{$field->getName()}{/if}</option>
+        <option value="{$field->getId()}">{if $field->getId()=='name'}Полное имя{else}{$field->getName()}{/if}</option>
     {/foreach}
     <optgroup label="Адрес">
         {foreach from=$address_fields item=address}
-        <option value="address.{$address->getId()}">{$address->getName()}</option>
+            <option value="address.{$address->getId()}">{$address->getName()}</option>
         {/foreach}
     </optgroup>
 </select>
@@ -33,7 +51,7 @@
 
 
         {literal}
-        <p>{shopInstantorderPlugin::display()} - Код хелпера вывода</p>
+            <p>{shopInstantorderPlugin::display()} - Код хелпера вывода</p>
         {/literal}
         <p class="gray">
             <i class="icon16 exclamation"></i>
@@ -63,7 +81,7 @@
                 </select>
             </div>
         </div>
-        
+
         <div class="field">
             <div class="name">
                 Стандартный вывод в корзине
@@ -101,9 +119,22 @@
             <div class="value">
                 <select name="shop_instantorder[theme]">
                     {foreach from=$themes item=theme}
-                    <option {if $settings.theme == $theme} selected="selected"{/if}  value="{$theme}">{$theme}</option>
+                        <option {if $settings.theme == $theme} selected="selected"{/if}  value="{$theme}">{$theme}</option>
                     {/foreach}
                 </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
+                Стиль кнопки
+            </div>
+            <div class="value">
+                <input class="button_style" type="hidden" name="shop_instantorder[button_style]" value="{$settings.button_style|escape}"/>                 
+
+                {include file="./EditButton.html" css_button_style=$settings.css_button_style}
+                <textarea style="display:none;" id="css_button_style" name="shop_instantorder[css_button_style]">{$settings.css_button_style|escape}</textarea>
+
             </div>
         </div>
 
@@ -157,7 +188,7 @@
                 <p class="hint">{ldelim}order_id{rdelim} - заменяется на номер заказа</p>
             </div>
         </div>
-        
+
         <div class="field">
             <div class="name">
                 JavaScript-код, выполняемый после успешного заказа
@@ -179,7 +210,7 @@
                 </select>
             </div>
         </div>
-        
+
         <div class="field">
             <div class="name">
                 Выводить поле комментария заказа
@@ -202,31 +233,31 @@
                 </tr>
 
                 {foreach from=$selected_fields key=key item=selected_field}
-                <tr>
-                    <td><input class="long" type="text" placeholder="Название" value="{$selected_field.name|escape}" name="field_names[]"></td>
+                    <tr>
+                        <td><input class="long" type="text" placeholder="Название" value="{$selected_field.name|escape}" name="field_names[]"></td>
 
-                    <td>
-                        <select name="field_vals[]">
-                            {foreach from=$fields item=field}
-                            <option {if $selected_field.type==$field->getId()}selected="selected"{/if} value="{$field->getId()}">{if $field->getId()=='name'}Полное имя{else}{$field->getName()}{/if}</option>
-                            {/foreach}
-                            <optgroup label="Адрес">
-                                {foreach from=$address_fields item=address}
-                                <option {if $selected_field.type=="address.`$address->getId()`"}selected="selected"{/if} value="address.{$address->getId()}">{$address->getName()}</option>
+                        <td>
+                            <select name="field_vals[]">
+                                {foreach from=$fields item=field}
+                                    <option {if $selected_field.type==$field->getId()}selected="selected"{/if} value="{$field->getId()}">{if $field->getId()=='name'}Полное имя{else}{$field->getName()}{/if}</option>
                                 {/foreach}
-                            </optgroup>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="field_required[]">
-                            <option {if $selected_field.required}selected="selected"{/if} value="1">Да</option>
-                            <option {if !$selected_field.required}selected="selected"{/if} value="0">Нет</option>
-                        </select>
-                    </td>
-                    <td>
-                        <a class="remove-field" href="javascript:void(0)"><i class="icon16 cross"></i></a>
-                    </td>
-                </tr>
+                                <optgroup label="Адрес">
+                                    {foreach from=$address_fields item=address}
+                                        <option {if $selected_field.type=="address.`$address->getId()`"}selected="selected"{/if} value="address.{$address->getId()}">{$address->getName()}</option>
+                                    {/foreach}
+                                </optgroup>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="field_required[]">
+                                <option {if $selected_field.required}selected="selected"{/if} value="1">Да</option>
+                                <option {if !$selected_field.required}selected="selected"{/if} value="0">Нет</option>
+                            </select>
+                        </td>
+                        <td>
+                            <a class="remove-field" href="javascript:void(0)"><i class="icon16 cross"></i></a>
+                        </td>
+                    </tr>
                 {/foreach}
             </table>
         </div>
@@ -235,21 +266,28 @@
             <a class="add-field" href="javascript:void(0)"><i class="icon16 add"></i>Добавить поле</a>
         </div>
 
-
+        <br/>    
         <div class="field">
-            <div class="name">Шаблон<br /><span class="hint">HTML + Smarty</span></div>
-            <div class="value no-shift">
-                <div id="s-editor-core-wrapper">
-                    <textarea id="sf-template" class="body" name="template">{$template|escape}</textarea>
-                </div>
-            </div>
+            <a class="edit-templates" href="javascript:void(0)"><i class="icon16 edit"></i>Изменить шаблоны</a>
+        </div>   
+        <div class="templates-block">
+            {foreach $templates as $key => $template}
+                <div class="field">
+                    <div class="name">{$template.name}<br /><span class="hint">HTML + Smarty</span></div>
+                    <div class="value no-shift">
+                        <div id="s-editor-core-wrapper">
+                            <textarea id="sf-template-{$key}" class="body" name="templates[{$key}]">{$template.content|escape}</textarea>
+                        </div>
+                    </div>
 
-            {if $change_tpl}
-            <div class="value">
-                <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
-                <input type="checkbox" name="reset_tpl" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
-            </div>
-            {/if}
+                    {if $template.change_tpl}
+                        <div class="value">
+                            <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
+                            <input type="checkbox" name="reset_tpls[{$key}]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+                        </div>
+                    {/if}
+                </div>
+            {/foreach}
         </div>
 
 
@@ -263,9 +301,20 @@
         </div>
     </form>
 </div>
+
 <script type="text/javascript">
 
     $(function() {
+
+        $('.edit-templates').click(function() {
+            $('.templates-block').show();
+        });
+
+        $('#css_gradients div').click(function() {
+            $('#css_gradients span').removeClass('active');
+            $(this).closest('span').addClass('active');
+            $('.button_style').val($(this).attr('class'));
+        });
         function initRemove() {
             $('.remove-field').click(function() {
                 $(this).parent().parent().remove();
@@ -282,38 +331,45 @@
             initRemove();
         });
 
+
+
+
     });
-
     $(function() {
-
-
-        var c = CodeMirror.fromTextArea(document.getElementById('sf-template'), {
-            mode: "text/html",
-            tabMode: "indent",
-            height: "dynamic",
-            lineWrapping: true
-        });
-        $("#sf-template").change(function() {
-            c.setValue($(this).val());
-        });
-        $("#sf-settings").submit(function() {
-            var f = $(this);
-            $.post(f.attr('action'), f.serialize(), function(response) {
-                if (response.status == 'ok') {
-                    $('#wa-design-button').removeClass('red').addClass('green');
-                    $("#wa-editor-status-fail").hide()
-                    $("#wa-editor-status-ok span").html(response.data.message);
-                    $("#wa-editor-status-ok").fadeIn('slow', function() {
-                        $(this).fadeOut(1000);
-                    });
-                } else {
-                    $('#wa-design-button').removeClass('green').addClass('red');
-                    $("#wa-editor-status-ok").hide();
-                    $("#wa-editor-status-fail span").html(response.errors.join(', '));
-                    $("#wa-editor-status-fail").fadeIn('slow');
-                }
-            }, "json");
-            return false;
-        });
+        var ids = [{foreach $templates as $key => $template}"sf-template-{$key}",{/foreach}];
+                for (var i = 0; i < ids.length; i++) {
+            var mode = 'text/html';
+            if (ids[i] == 'sf-template-InstantorderScript') {
+                mode = 'javascript';
+            }
+            var c = CodeMirror.fromTextArea(document.getElementById(ids[i]), {
+                mode: mode,
+                tabMode: "indent",
+                height: "dynamic",
+                lineWrapping: true
+            });
+            $(ids[i]).change(function() {
+                c.setValue($(this).val())
+            });
+            $(ids[i]).submit(function() {
+                var f = $(this);
+                $.post(f.attr('action'), f.serialize(), function(response) {
+                    if (response.status == 'ok') {
+                        $('#wa-design-button').removeClass('red').addClass('green');
+                        $("#wa-editor-status-fail").hide()
+                        $("#wa-editor-status-ok span").html(response.data.message);
+                        $("#wa-editor-status-ok").fadeIn('slow', function() {
+                            $(this).fadeOut(1000);
+                        });
+                    } else {
+                        $('#wa-design-button').removeClass('green').addClass('red');
+                        $("#wa-editor-status-ok").hide();
+                        $("#wa-editor-status-fail span").html(response.errors.join(', '));
+                        $("#wa-editor-status-fail").fadeIn('slow');
+                    }
+                }, "json")
+                return false;
+            });
+        }
     });
 </script>

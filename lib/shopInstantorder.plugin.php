@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @author Коробов Николай wa-plugins.ru <support@wa-plugins.ru>
+ * @author  wa-plugins.ru <support@wa-plugins.ru>
  * @link http://wa-plugins.ru/
  */
 class shopInstantorderPlugin extends shopPlugin {
@@ -70,6 +70,14 @@ class shopInstantorderPlugin extends shopPlugin {
             $view->assign('settings', $plugin->getSettings());
             $view->assign('selected_fields', $selected_fields);
             $view->assign('countries', $countries);
+
+            $template_path = wa()->getDataPath('plugins/instantorder/js/script.js', true, 'shop');
+            if (file_exists($template_path)) {
+                $template_url = wa()->getDataUrl('plugins/instantorder/js/script.js', true, 'shop');
+            } else {
+                $template_url = wa()->getAppStaticUrl() . 'plugins/instantorder/js/script.js';
+            }
+            wa()->getResponse()->addJs(substr($template_url, 1));
 
             $template_path = wa()->getDataPath('plugins/instantorder/templates/Instantorder.html', false, 'shop', true);
             if (!file_exists($template_path)) {

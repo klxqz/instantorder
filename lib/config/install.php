@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @author Коробов Николай wa-plugins.ru <support@wa-plugins.ru>
+ * @author  wa-plugins.ru <support@wa-plugins.ru>
  * @link http://wa-plugins.ru/
  */
 $plugin_id = array('shop', 'instantorder');
@@ -20,3 +20,5 @@ $app_settings_model->set($plugin_id, 'resizable', '1');
 $app_settings_model->set($plugin_id, 'draggable', '1');
 $app_settings_model->set($plugin_id, 'successful_order_js', '');
 $app_settings_model->set($plugin_id, 'is_comment', '1');
+$app_settings_model->set($plugin_id, 'button_style', 'gradient_0');
+$app_settings_model->set($plugin_id, 'css_button_style', '');

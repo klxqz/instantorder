@@ -2,15 +2,12 @@
 <link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/themes/{$settings.theme}/jquery.ui.theme.css">
 <script src="{$wa_app_static_url}plugins/instantorder/js/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/style.css" />
-<script type='text/javascript'>
-    var $wa_app_url = '{$wa_app_url}';
-    var instantorder_draggable = {if $settings.draggable}true{else}false{/if};
-    var instantorder_resizable = {if $settings.resizable}true{else}false{/if};
-    var instantorder_title = '{$settings.title|escape}';
-    var instantorder_width = parseInt('{$settings.width_modal|escape}');
-    var instantorder_height = parseInt('{$settings.height_modal|escape}');
-</script>
-<script src="{$wa_app_static_url}plugins/instantorder/js/script.js"></script>
+{if $settings.css_button_style}
+    {$settings.css_button_style}
+{else}
+    <link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/gradient.css" />
+{/if}
+
 
 <div class="instantorder_block">
     {if !isset($product) || count($product.skus) > 1}
@@ -20,65 +17,73 @@
         {$product_available = $product.status && $sku.available && ($wa->shop->settings('ignore_stock_count') || $sku.count === null || $sku.count > 0)}
     {/if}
     {if $product_available}
-    <a class="instantorder_button" href="#">{$settings.link_name|escape}</a>
+        <span class="instantorder_button{if isset($settings.button_style)} {$settings.button_style}{/if}">{$settings.link_name|escape}</span>
     {/if}
     <div id="instantorder_dialog">
-        <form id="instantorder_form" action="{$wa_app_url}instantorder/">
-            <table  id="instantorder_table">
-                {foreach from=$selected_fields item=selected_field}
+        <table  id="instantorder_table">
+            {foreach from=$selected_fields item=selected_field}
                 <tr>
                     <td>{$selected_field.name}{if $selected_field.required}<span class="required">*</span>{/if}:&nbsp;</td>
                     <td>
                         {if $selected_field.type=='address.country'}
-                        <select class="select_countries{if $selected_field.required} required_field{/if}" name="fields[{$selected_field.type}]" >
-                            <option value="">Выберите страну</option>
-                            {foreach from=$countries key=key item=country}
-                            <option value="{$key}"  {if isset($selected_field.def_value) && $selected_field.def_value==$key}selected="selected"{/if}>{$country.name}</option>
-                            {/foreach}
-                        </select>
-                        {elseif $selected_field.type=='address.region'}
-                        <div class="region_block">
-                            <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
-                                <select style="display:none;" disabled="disabled" class="select_region{if $selected_field.required} required_field{/if}" name="fields[{$selected_field.type}]" >
-                                <option value="">Выберите регион</option>
+                            <select class="select_countries{if $selected_field.required} required_field{/if}" name="fields[{$selected_field.type}]" >
+                                <option value="">Выберите страну</option>
+                                {foreach from=$countries key=key item=country}
+                                    <option value="{$key}"  {if isset($selected_field.def_value) && $selected_field.def_value==$key}selected="selected"{/if}>{$country.name}</option>
+                                {/foreach}
                             </select>
-                        </div>
+                        {elseif $selected_field.type=='address.region'}
+                            <div class="region_block">
+                                <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
+                                <select style="display:none;" disabled="disabled" class="select_region{if $selected_field.required} required_field{/if}" name="fields[{$selected_field.type}]" >
+                                    <option value="">Выберите регион</option>
+                                </select>
+                            </div>
                         {else}
-                        <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
+                            <input {if $selected_field.required}class="required_field"{/if} type="text" name="fields[{$selected_field.type}]" value="{if isset($selected_field.def_value)}{$selected_field.def_value}{/if}" />
                         {/if}
                     </td>
                 </tr>
-                {/foreach}
-                
-                {if $settings.is_comment}
+            {/foreach}
+
+            {if $settings.is_comment}
                 <tr>
                     <td>Комментарий к заказу:</td>
                     <td>
                         <textarea name="comment"></textarea>                        
                     </td>
                 </tr>
-                {/if}
-                {if $settings.is_captcha}
+            {/if}
+            {if $settings.is_captcha}
                 <tr>
                     <td colspan="2">
                         {$wa->captcha(!empty($errors.captcha))}
                     </td>
                 </tr>
-                {/if}
-                <tr>
-                    <td colspan="2" align="center" >
-                        <input type="submit" value="Оформить заказ"/>
-                    </td>
-                </tr>
+            {/if}
+            <tr>
+                <td colspan="2" align="center" >
+                    <input type="submit" value="Оформить заказ"/>
+                </td>
+            </tr>
 
-                <tr>
-                    <td colspan="2" align="center" class="response" >
+            <tr>
+                <td colspan="2" align="center" class="response" >
 
-                    </td>
-                </tr>
-            </table>
-        </form>
-
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
-
+<script type='text/javascript'>
+    $(function() {
+        $.instantorder.init({
+            $wa_app_url: '{$wa_app_url}',
+            instantorder_draggable: {if $settings.draggable}true{else}false{/if},
+            instantorder_resizable: {if $settings.resizable}true{else}false{/if},
+            instantorder_title: '{$settings.title|escape}',
+            instantorder_width: parseInt('{$settings.width_modal|escape}'),
+            instantorder_height: parseInt('{$settings.height_modal|escape}')
+         });
+      });
+</script>

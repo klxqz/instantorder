@@ -1,5 +1,8 @@
 <link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/gradient.css">
-<style type="text/css">            
+<style type="text/css">  
+    table td{
+        vertical-align: top;
+    }
     #instantorder_table{
         margin-top: 10px;
     }
@@ -14,7 +17,11 @@
         overflow-y: hidden;
         overflow-x: auto;
     }
+    #css_gradients{
+        display: table;
+    }
     #css_gradients div {
+        margin: 5px;
         cursor: pointer;
         height: 50px;
         width: 50px;
@@ -127,12 +134,22 @@
 
         <div class="field">
             <div class="name">
+                Простая кнопка без стиля
+            </div>
+            <div class="value">
+                <input type="hidden" name="shop_instantorder[without_style]" value="0"/>                 
+                <input autocomplete="off" id="without-style-checkbox" type="checkbox" {if $settings.without_style}checked="checked"{/if}  name="shop_instantorder[without_style]" value="1" />
+            </div>
+        </div>
+
+        <div id="button-style-field" class="field" style="{if $settings.without_style}display:none;{/if}">
+            <div class="name">
                 Стиль кнопки
             </div>
             <div class="value">
                 <input class="button_style" type="hidden" name="shop_instantorder[button_style]" value="{$settings.button_style|escape}"/>                 
 
-                {include file="./EditButton.html" css_button_style=$settings.css_button_style}
+                {include file="./EditButton.html"}
                 <textarea style="display:none;" id="css_button_style" name="shop_instantorder[css_button_style]">{$settings.css_button_style|escape}</textarea>
 
             </div>
@@ -305,16 +322,23 @@
 <script type="text/javascript">
 
     $(function() {
-
+        $('#without-style-checkbox').change(function() {
+            if ($(this).prop('checked')) {
+                $('#button-style-field').hide();
+            } else {
+                $('#button-style-field').show();
+            }
+        });
         $('.edit-templates').click(function() {
             $('.templates-block').show();
         });
-
         $('#css_gradients div').click(function() {
             $('#css_gradients span').removeClass('active');
             $(this).closest('span').addClass('active');
             $('.button_style').val($(this).attr('class'));
         });
+        var button_style = $('.button_style').val();
+        $('#css_gradients div.' + button_style).closest('span').addClass('active');
         function initRemove() {
             $('.remove-field').click(function() {
                 $(this).parent().parent().remove();
@@ -330,10 +354,6 @@
             </tr>');
             initRemove();
         });
-
-
-
-
     });
     $(function() {
         var ids = [{foreach $templates as $key => $template}"sf-template-{$key}",{/foreach}];

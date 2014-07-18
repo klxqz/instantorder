@@ -22,3 +22,5 @@ $app_settings_model->set($plugin_id, 'successful_order_js', '');
 $app_settings_model->set($plugin_id, 'is_comment', '1');
 $app_settings_model->set($plugin_id, 'button_style', 'gradient_0');
 $app_settings_model->set($plugin_id, 'css_button_style', '');
+$app_settings_model->set($plugin_id, 'without_style', '1');
+$app_settings_model->set($plugin_id, 'personal_css', '0');

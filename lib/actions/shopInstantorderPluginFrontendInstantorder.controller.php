@@ -6,17 +6,18 @@
  */
 class shopInstantorderPluginFrontendInstantorderController extends waJsonController {
 
+    protected $plugin_id = array('shop', 'instantorder');
+
     public function execute() {
         try {
-            $plugin = wa()->getPlugin('instantorder');
+            $app_settings_model = new waAppSettingsModel();
             $fields = waRequest::post('fields', array());
             $comment = waRequest::post('comment');
             $product_id = waRequest::post('product_id');
-            $quantity = waRequest::post('quantity', 1);
             $sku_id = waRequest::post('sku_id');
-            $features = waRequest::post('features', array());
 
-            if ($plugin->getSettings('is_captcha') && !wa()->getCaptcha()->isValid()) {
+
+            if ($app_settings_model->get($this->plugin_id, 'is_captcha') && !wa()->getCaptcha()->isValid()) {
                 $this->errors = _w('Invalid captcha code');
                 return false;
             }
@@ -47,22 +48,14 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
             }
 
             if ($product_id || $sku_id) {
-                $data = array(
-                    'features' => $features,
-                    'sku_id' => $sku_id,
-                    'product_id' => $product_id,
-                    'quantity' => $quantity,
-                );
-                $this->addToCart($data);
+                $this->addToCart();
             }
 
             $order_id = $this->createOrder($contact, $comment);
-            $plugin = wa()->getPlugin('instantorder');
-            $successful_order = $plugin->getSettings('successful_order');
-            $successful_order_js = $plugin->getSettings('successful_order_js');
+            $successful_order = $app_settings_model->get($this->plugin_id, 'successful_order');
+            $successful_order_js = $app_settings_model->get($this->plugin_id, 'successful_order_js');
             $successful_order = str_replace('{order_id}', shopHelper::encodeOrderId($order_id), $successful_order);
             $this->response['message'] = $successful_order . '<script>' . $successful_order_js . '</script>';
-            waSystem::popActivePlugin();
         } catch (Exception $ex) {
             $this->errors = $ex->getMessage();
         }
@@ -126,15 +119,40 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
         }
     }
 
-    protected function addToCart($data) {
+    protected function addToCart() {
         $cart_model = new shopCartItemsModel();
         $code = waRequest::cookie('shop_cart');
         if (!$code) {
             $code = md5(uniqid(time(), true));
+            // header for IE
+            wa()->getResponse()->addHeader('P3P', 'CP="NOI ADM DEV COM NAV OUR STP"');
+            // set cart cookie
             wa()->getResponse()->setCookie('shop_cart', $code, time() + 30 * 86400, null, '', false, true);
         }
 
+        $data = waRequest::post();
 
+        if (isset($data['parent_id'])) {
+            $parent = $cart_model->getById($data['parent_id']);
+            unset($parent['id']);
+            $parent['parent_id'] = $data['parent_id'];
+            $parent['type'] = 'service';
+            $parent['service_id'] = $data['service_id'];
+            if (isset($data['service_variant_id'])) {
+                $parent['service_variant_id'] = $data['service_variant_id'];
+            } else {
+                $service_model = new shopServiceModel();
+                $service = $service_model->getById($data['service_id']);
+                $parent['service_variant_id'] = $service['variant_id'];
+            }
+            $cart = new shopCart($code);
+
+            $id = $cart->addItem($parent);
+            $total = $cart->total();
+            $discount = $cart->discount();
+            return;
+        }
+        
         $sku_model = new shopProductSkusModel();
         $product_model = new shopProductModel();
         if (!isset($data['product_id'])) {
@@ -160,14 +178,14 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
                     }
 
                     if (!$sku) {
-                        throw new waException("Товар не найден");
-                        return false;
+                        throw new waException(_w('This product is not available for purchase'));
+                        return;
                     }
                 }
             }
         }
 
-        $quantity = $data['quantity'];
+        $quantity = waRequest::post('quantity', 1);
 
         if ($product && $sku) {
             // check quantity
@@ -175,10 +193,37 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
                 $c = $cart_model->countSku($code, $sku['id']);
                 if ($sku['count'] !== null && $c + $quantity > $sku['count']) {
                     $quantity = $sku['count'] - $c;
-                    throw new waException("Недопустимое количество товара на складе");
+                    $name = $product['name'] . ($sku['name'] ? ' (' . $sku['name'] . ')' : '');
+                    if (!$quantity) {
+                        throw new waException(sprintf(_w('Only %d pcs of %s are available, and you already have all of them in your shopping cart.'), $sku['count'], $name));
+                        return;
+                    } else {
+                        throw new waException(sprintf(_w('Only %d pcs of %s are available, and you already have all of them in your shopping cart.'), $sku['count'], $name));
+                        return;
+                    }
                 }
             }
-            $services = array();
+            $services = waRequest::post('services', array());
+            if ($services) {
+                $variants = waRequest::post('service_variant');
+                $temp = array();
+                $service_ids = array();
+                foreach ($services as $service_id) {
+                    if (isset($variants[$service_id])) {
+                        $temp[$service_id] = $variants[$service_id];
+                    } else {
+                        $service_ids[] = $service_id;
+                    }
+                }
+                if ($service_ids) {
+                    $service_model = new shopServiceModel();
+                    $temp_services = $service_model->getById($service_ids);
+                    foreach ($temp_services as $row) {
+                        $temp[$row['id']] = $row['variant_id'];
+                    }
+                }
+                $services = $temp;
+            }
             $item_id = null;
             $item = $cart_model->getItemByProductAndServices($code, $product['id'], $sku['id'], $services);
             if ($item) {
@@ -191,7 +236,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
             if (!$item_id) {
                 $data = array(
                     'code' => $code,
-                    'contact_id' => wa()->getUser()->getId(),
+                    'contact_id' => $this->getUser()->getId(),
                     'product_id' => $product['id'],
                     'sku_id' => $sku['id'],
                     'create_datetime' => date('Y-m-d H:i:s'),
@@ -211,12 +256,13 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
                 }
             }
             // update shop cart session data
-
+            $shop_cart = new shopCart($code);
             wa()->getStorage()->remove('shop/cart');
-            return true;
+            $total = $shop_cart->total();
+
+
         } else {
-            throw new waException("Товар не найден");
-            return false;
+            throw new waException('product not found');
         }
     }
 

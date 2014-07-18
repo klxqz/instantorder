@@ -5,24 +5,7 @@
  * @link http://wa-plugins.ru/
  */
 class shopInstantorderPlugin extends shopPlugin {
-
-    protected static $plugin;
-
-    public function __construct($info) {
-        parent::__construct($info);
-        if (!self::$plugin) {
-            self::$plugin = &$this;
-        }
-    }
-
-    protected static function getThisPlugin() {
-        if (self::$plugin) {
-            return self::$plugin;
-        } else {
-            return wa()->getPlugin('instantorder');
-        }
-    }
-
+   
     public function frontendProduct() {
         if ($this->getSettings('frontend_product')) {
             return array('cart' => self::display());
@@ -36,9 +19,9 @@ class shopInstantorderPlugin extends shopPlugin {
     }
 
     public static function display() {
-        $plugin = self::getThisPlugin();
+        $app_settings_model = new waAppSettingsModel();
         $html = '';
-        if ($plugin->getSettings('status')) {
+        if ($app_settings_model->get(array('shop', 'instantorder'), 'status')) {
             if (wa()->getUser()->isAuth()) {
                 $contact = wa()->getUser();
                 $contact_data = $contact->load();
@@ -67,7 +50,7 @@ class shopInstantorderPlugin extends shopPlugin {
             $country_model = new waCountryModel();
             $countries = $country_model->all();
             $view = wa()->getView();
-            $view->assign('settings', $plugin->getSettings());
+            $view->assign('settings', $app_settings_model->get(array('shop', 'instantorder')));
             $view->assign('selected_fields', $selected_fields);
             $view->assign('countries', $countries);
 
@@ -85,7 +68,6 @@ class shopInstantorderPlugin extends shopPlugin {
             }
             $html = $view->fetch($template_path);
         }
-        waSystem::popActivePlugin();
         return $html;
     }
 

@@ -3,11 +3,7 @@ td
 {
 	padding: 5px;
 }
-tr
-{
-	background-color: #dae7f1;
-	font-size: 80%;
-}
+
 .tr0
 {
 	background-color: #fdfdc5;
@@ -49,9 +45,8 @@ tr
 }
 .resultbutton_edit
 {
-	border: 0 solid #00f;
-	float: left;
-	margin: 150px 10px 0 10px;
+    display: block;
+
 }
 #form_00
 {
@@ -60,8 +55,7 @@ tr
 #form_01
 {
 	display: none;
-	float: left;
-	margin: 0 0 0 100px;
+	margin: 0 0 0 20px;
 }
 h3
 {

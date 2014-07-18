@@ -88,8 +88,8 @@
         },
         initSubmitForm: function() {
             var that = this;
-            $('#instantorder_form').submit(function(event) {
-                event.preventDefault();
+            $('#instantorder_form').submit(function() {
+                var form = $(this);
                 var required = false;
                 $(this).find('.required_field').each(function() {
                     if ($(this).prop('disabled') == false && !$(this).val().length) {
@@ -107,28 +107,31 @@
                         $('.response').hide();
                     }, 5000);
                 } else {
-                    $(this).find('input[type=submit]').attr('disabled', true);
+                    form.find('input[type=submit]').attr('disabled', true);
+                    form.find('input[type=submit]').after('<i class="icon16 loading"></i>');
                     $.ajax({
                         type: 'POST',
                         url: that.options.$wa_app_url + 'instantorder/',
                         dataType: 'json',
                         data: $(this).serialize() + '&' + $('#cart-form').serialize(),
                         success: function(data, textStatus, jqXHR) {
+                            form.find('.loading').remove();
                             if (data.status == 'ok') {
                                 $('.response').css('color', 'green');
                                 $('.response').html(data.data.message);
-
                             } else {
+                                form.find('input[type=submit]').removeAttr('disabled');
                                 $('.response').css('color', 'red');
                                 $('.response').html(data.errors);
+                                setTimeout(function() {
+                                    $('.response').hide();
+                                }, 10000);
                             }
                             $('.response').show();
-                            setTimeout(function() {
-                                $('.response').hide();
-                            }, 10000);
                         }
                     });
                 }
+                return false;
             });
         }
     };

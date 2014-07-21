@@ -1,13 +1,24 @@
 <link rel="stylesheet" href="{$wa_url}wa-content/css/jquery-ui/jquery-ui-1.7.2.custom.css" />
 <link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/themes/{$settings.theme}/jquery.ui.theme.css">
-<script src="{$wa_app_static_url}plugins/instantorder/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.core.min.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.widget.min.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.mouse.min.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.position.min.js"></script>
+{if $settings.draggable}
+    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.draggable.min.js"></script>
+{/if}
+{if $settings.resizable}
+    <script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.resizable.min.js"></script>
+{/if}
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.button.min.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-ui/jquery.ui.dialog.min.js"></script>
+
 <link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/style.css" />
 {if $settings.personal_css && $settings.css_button_style}
     {$settings.css_button_style}
 {else}
     <link rel="stylesheet" href="{$wa_app_static_url}plugins/instantorder/css/gradient.css" />
 {/if}
-
 
 <div class="instantorder_block">
     {if !isset($product) || count($product.skus) > 1}
@@ -72,10 +83,8 @@
                     <input type="submit" value="Оформить заказ"/>
                 </td>
             </tr>
-
             <tr>
                 <td colspan="2" align="center" class="response" >
-
                 </td>
             </tr>
         </table>
@@ -86,10 +95,10 @@
         $.instantorder.init({
             $wa_app_url: '{$wa_app_url}',
             instantorder_draggable: {if $settings.draggable}true{else}false{/if},
-                        instantorder_resizable: {if $settings.resizable}true{else}false{/if},
-                                    instantorder_title: '{$settings.title|escape}',
-                                    instantorder_width: parseInt('{$settings.width_modal|escape}'),
-                                    instantorder_height: parseInt('{$settings.height_modal|escape}')
-                                });
-                            });
+            instantorder_resizable: {if $settings.resizable}true{else}false{/if},
+            instantorder_title: '{$settings.title|escape}',
+            instantorder_width: parseInt('{$settings.width_modal|escape}'),
+            instantorder_height: parseInt('{$settings.height_modal|escape}')
+        });
+    });
 </script>

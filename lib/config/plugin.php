@@ -8,7 +8,7 @@ return array(
     'name' => 'Быстрый заказ',
     'description' => 'Позволяет быстро оформить заказ',
     'vendor' => '985310',
-    'version' => '1.1.1',
+    'version' => '1.2.0',
     'img' => 'img/instantorder.png',
     'frontend' => true,
     'shop_settings' => true,

@@ -65,136 +65,156 @@
             Используя этот код Вы можете осуществить вывод "Быстрого заказа" в любом месте вашей темы оформления, это позволяет избавиться от привязки к конкретным местам вывода плагина
         </p>
 
-        <div class="field">
-            <div class="name">
-                Статус плагина
+        <div class="field-group">
+            <h3>Основные настройки</h3>
+            <div class="field">
+                <div class="name">
+                    Статус плагина
+                </div>
+                <div class="value">
+                    <select name="shop_instantorder[status]">
+                        <option {if $settings.status == 1} selected="selected"{/if} value="1">Включен</option>
+                        <option {if $settings.status == 0} selected="selected"{/if} value="0">Выключен</option>
+                    </select>
+                </div>
             </div>
-            <div class="value">
-                <select name="shop_instantorder[status]">
-                    <option {if $settings.status == 1} selected="selected"{/if} value="1">Включен</option>
-                    <option {if $settings.status == 0} selected="selected"{/if} value="0">Выключен</option>
-                </select>
+
+            <div class="field">
+                <div class="name">
+                    Стандартный вывод в карточке товара
+                </div>
+                <div class="value">
+                    <select name="shop_instantorder[frontend_product]">
+                        <option {if $settings.frontend_product == 1} selected="selected"{/if} value="1">Включен</option>
+                        <option {if $settings.frontend_product == 0} selected="selected"{/if} value="0">Выключен</option>
+                    </select>
+                </div>
             </div>
+
+            <div class="field">
+                <div class="name">
+                    Стандартный вывод в корзине
+                </div>
+                <div class="value">
+                    <select name="shop_instantorder[frontend_cart]">
+                        <option {if $settings.frontend_cart == 1} selected="selected"{/if} value="1">Включен</option>
+                        <option {if $settings.frontend_cart == 0} selected="selected"{/if} value="0">Выключен</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="name">
+                    Заголовок
+                </div>
+                <div class="value">
+                    <input type="text" name="shop_instantorder[title]" value="{$settings.title|escape}"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="name">
+                    Название ссылки
+                </div>
+                <div class="value">
+                    <input type="text" name="shop_instantorder[link_name]" value="{$settings.link_name|escape}"/>
+                </div>
+            </div>
+
+
+            <div class="field">
+                <div class="name">
+                    Минимальная сумма заказа
+                </div>
+                <div class="value">
+                    <input type="text" name="shop_instantorder[min_order_sum]" value="{$settings.min_order_sum|escape}"/>
+                </div>
+            </div>
+
         </div>
 
-        <div class="field">
-            <div class="name">
-                Стандартный вывод в карточке товара
+        <div class="field-group">
+            <h3>Кастомизация</h3>
+
+            <div class="field">
+                <div class="name">
+                    Тема оформления
+                </div>
+                <div class="value">
+                    <select name="shop_instantorder[theme]">
+                        {foreach from=$themes item=theme}
+                            <option {if $settings.theme == $theme} selected="selected"{/if}  value="{$theme}">{$theme}</option>
+                        {/foreach}
+                    </select>
+                </div>
             </div>
-            <div class="value">
-                <select name="shop_instantorder[frontend_product]">
-                    <option {if $settings.frontend_product == 1} selected="selected"{/if} value="1">Включен</option>
-                    <option {if $settings.frontend_product == 0} selected="selected"{/if} value="0">Выключен</option>
-                </select>
+
+            <div class="field">
+                <div class="name">
+                    Простая кнопка без стиля
+                </div>
+                <div class="value">
+                    <input type="hidden" name="shop_instantorder[without_style]" value="0"/>        
+                    <input autocomplete="off" id="without-style-checkbox" type="checkbox" {if $settings.without_style}checked="checked"{/if}  name="shop_instantorder[without_style]" value="1" />
+                    <span>- Вы можете изменить стиль кнопки под дизайн своего сайта</span>   
+                </div>
+            </div>
+
+            <div id="button-style-field" class="field" style="{if $settings.without_style}display:none;{/if}">
+                <div class="name">
+                    Стиль кнопки
+                </div>
+                <div class="value">
+                    <input class="button_style" type="hidden" name="shop_instantorder[button_style]" value="{$settings.button_style|escape}"/>                 
+
+                    {include file="./EditButton.html"}
+                    <textarea style="display:none;" id="css_button_style" name="shop_instantorder[css_button_style]">{$settings.css_button_style|escape}</textarea>
+
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="name">
+                    Ширина модального окна
+                </div>
+                <div class="value">
+                    <input type="text" name="shop_instantorder[width_modal]" value="{$settings.width_modal|escape}"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="name">
+                    Высота модального окна
+                </div>
+                <div class="value">
+                    <input type="text" name="shop_instantorder[height_modal]" value="{$settings.height_modal|escape}"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="name">
+                    Изменение размеров модального окна
+                </div>
+                <div class="value">
+                    <select name="shop_instantorder[resizable]">
+                        <option {if $settings.resizable == 1} selected="selected"{/if} value="1">Да</option>
+                        <option {if $settings.resizable == 0} selected="selected"{/if} value="0">Нет</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <div class="name">
+                    Перемещение модального окна
+                </div>
+                <div class="value">
+                    <select name="shop_instantorder[draggable]">
+                        <option {if $settings.draggable == 1} selected="selected"{/if} value="1">Да</option>
+                        <option {if $settings.draggable == 0} selected="selected"{/if} value="0">Нет</option>
+                    </select>
+                </div>
             </div>
         </div>
-
-        <div class="field">
-            <div class="name">
-                Стандартный вывод в корзине
-            </div>
-            <div class="value">
-                <select name="shop_instantorder[frontend_cart]">
-                    <option {if $settings.frontend_cart == 1} selected="selected"{/if} value="1">Включен</option>
-                    <option {if $settings.frontend_cart == 0} selected="selected"{/if} value="0">Выключен</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="field">
-            <div class="name">
-                Заголовок
-            </div>
-            <div class="value">
-                <input type="text" name="shop_instantorder[title]" value="{$settings.title|escape}"/>
-            </div>
-        </div>
-
-        <div class="field">
-            <div class="name">
-                Название ссылки
-            </div>
-            <div class="value">
-                <input type="text" name="shop_instantorder[link_name]" value="{$settings.link_name|escape}"/>
-            </div>
-        </div>
-
-        <div class="field">
-            <div class="name">
-                Тема оформления
-            </div>
-            <div class="value">
-                <select name="shop_instantorder[theme]">
-                    {foreach from=$themes item=theme}
-                        <option {if $settings.theme == $theme} selected="selected"{/if}  value="{$theme}">{$theme}</option>
-                    {/foreach}
-                </select>
-            </div>
-        </div>
-
-        <div class="field">
-            <div class="name">
-                Простая кнопка без стиля
-            </div>
-            <div class="value">
-                <input type="hidden" name="shop_instantorder[without_style]" value="0"/>                 
-                <input autocomplete="off" id="without-style-checkbox" type="checkbox" {if $settings.without_style}checked="checked"{/if}  name="shop_instantorder[without_style]" value="1" />
-            </div>
-        </div>
-
-        <div id="button-style-field" class="field" style="{if $settings.without_style}display:none;{/if}">
-            <div class="name">
-                Стиль кнопки
-            </div>
-            <div class="value">
-                <input class="button_style" type="hidden" name="shop_instantorder[button_style]" value="{$settings.button_style|escape}"/>                 
-
-                {include file="./EditButton.html"}
-                <textarea style="display:none;" id="css_button_style" name="shop_instantorder[css_button_style]">{$settings.css_button_style|escape}</textarea>
-
-            </div>
-        </div>
-
-        <div class="field">
-            <div class="name">
-                Ширина модального окна
-            </div>
-            <div class="value">
-                <input type="text" name="shop_instantorder[width_modal]" value="{$settings.width_modal|escape}"/>
-            </div>
-        </div>
-
-        <div class="field">
-            <div class="name">
-                Высота модального окна
-            </div>
-            <div class="value">
-                <input type="text" name="shop_instantorder[height_modal]" value="{$settings.height_modal|escape}"/>
-            </div>
-        </div>
-
-        <div class="field">
-            <div class="name">
-                Изменение размеров модального окна
-            </div>
-            <div class="value">
-                <select name="shop_instantorder[resizable]">
-                    <option {if $settings.resizable == 1} selected="selected"{/if} value="1">Да</option>
-                    <option {if $settings.resizable == 0} selected="selected"{/if} value="0">Нет</option>
-                </select>
-            </div>
-        </div>
-        <div class="field">
-            <div class="name">
-                Перемещение модального окна
-            </div>
-            <div class="value">
-                <select name="shop_instantorder[draggable]">
-                    <option {if $settings.draggable == 1} selected="selected"{/if} value="1">Да</option>
-                    <option {if $settings.draggable == 0} selected="selected"{/if} value="0">Нет</option>
-                </select>
-            </div>
-        </div>
+        <hr/>
 
         <div class="field">
             <div class="name">
@@ -215,6 +235,9 @@
                 <p class="hint">Этот код может быть использован для отслеживания целей в яндекс или google аналитике</p>
             </div>
         </div>
+
+
+        <h3>Поля формы быстрого оформления заказа:</h3>
 
         <div class="field">
             <div class="name">
@@ -239,10 +262,8 @@
                 </select>
             </div>
         </div>
-
-
         <br/><br/>
-        <div>Поля формы быстрого оформления заказа:</div>
+
         <div class="instantorder_container">
             <table id="instantorder_table" border="1">
                 <tr>

@@ -51,6 +51,21 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
                 $this->addToCart();
             }
 
+            $min_order_sum = $app_settings_model->get($this->plugin_id, 'min_order_sum');
+            $cart = new shopCart();
+            $def_currency = wa('shop')->getConfig()->getCurrency(true);
+            $cur_currency = wa('shop')->getConfig()->getCurrency(false);
+            $total = $cart->total(true);
+            $total = shop_currency($total, $cur_currency, $def_currency, false);
+
+            $min_order_sum = shop_currency($min_order_sum, null, null, false);
+
+            if ($total < $min_order_sum) {
+                $this->errors = _w('Вы не можете оформить заказ. Сумма Вашего заказа: ' . shop_currency($total) .
+                        ' Минимальная сумма заказа составляет: ' . shop_currency($min_order_sum));
+                return false;
+            }
+
             $order_id = $this->createOrder($contact, $comment);
             $successful_order = $app_settings_model->get($this->plugin_id, 'successful_order');
             $successful_order_js = $app_settings_model->get($this->plugin_id, 'successful_order_js');
@@ -152,7 +167,7 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
             $discount = $cart->discount();
             return;
         }
-        
+
         $sku_model = new shopProductSkusModel();
         $product_model = new shopProductModel();
         if (!isset($data['product_id'])) {
@@ -259,8 +274,6 @@ class shopInstantorderPluginFrontendInstantorderController extends waJsonControl
             $shop_cart = new shopCart($code);
             wa()->getStorage()->remove('shop/cart');
             $total = $shop_cart->total();
-
-
         } else {
             throw new waException('product not found');
         }

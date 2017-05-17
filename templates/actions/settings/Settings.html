@@ -30,6 +30,17 @@
         margin: 0;
         bottom: 0;
     }
+    i.icon32{
+        background-repeat: no-repeat;
+        display: inline-block;
+        height: 32px;
+        text-decoration: none;
+        text-indent: -9999px;
+        width: 32px;
+    }
+    i.icon16.integration{
+        background-image: url({$wa_app_static_url}plugins/instantorder/img/integration_icon_16x16.png);
+    }
 </style>
 
 <ul class="plugin-menu">
@@ -74,6 +85,38 @@
         <div class="field-group"{if !$settings.status|default:0} style="display:none"{/if}>
             <div class="route-container block double-padded">
 
+            </div>
+        </div>
+
+        <div class="field-group"{if !$settings.status|default:0} style="display:none"{/if}>
+            <h3>Расширьте функционал</h3>
+            <div class="field" id="wholesale-info">
+                <div class="name">
+                    <strong>Минимальный заказ</strong><br/><br/>
+                    <p class="hint">
+                        <strong>Интеграция плагинов</strong> «Минимальный заказ» и «Быстрый заказ» позволяет использовать плагину «Быстрый заказ» функции «Минимального заказа»
+                    </p>
+                </div>
+                <div class="value">
+                    <a target="_blank" href="https://www.webasyst.ru/store/plugin/shop/wholesale/">
+                        <img src="{$plugin->getPluginStaticUrl()}img/wholesale.png" />
+                    </a>
+                    <p class="hint">Воспользуйтесь дополнительным плагином <a target="_blank" href="https://www.webasyst.ru/store/plugin/shop/wholesale/">Минимальный заказ</a>, чтобы задать ограничения на минимальную сумму, минимальное количество товаров в заказе и другие ограничения</p>
+                </div>
+            </div>
+            <div class="field" id="minsum-info">
+                <div class="name">
+                    <strong>Минимальная сумма заказа</strong><br/><br/>
+                    <p class="hint">
+                        <strong>Интеграция плагинов</strong> «Минимальная сумма заказа» и «Быстрый заказ» позволяет использовать плагину «Быстрый заказ» функции «Минимальная сумма заказа»
+                    </p>
+                </div>
+                <div class="value">
+                    <a target="_blank" href="https://www.webasyst.ru/store/plugin/shop/minsum/">
+                        <img src="{$plugin->getPluginStaticUrl()}img/minsum.png" />
+                    </a>
+                    <p class="hint">Воспользуйтесь дополнительным плагином <a target="_blank" href="https://www.webasyst.ru/store/plugin/shop/minsum/">Минимальная сумма заказа</a>, чтобы задать ограничения на минимальную сумму товаров в заказе</p>
+                </div>
             </div>
         </div>
 

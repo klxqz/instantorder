@@ -8,6 +8,20 @@ class shopInstantorderPluginFrontendOrderController extends waJsonController {
 
     public function execute() {
         try {
+            if (!wa()->getPlugin('instantorder')->getSettings('status')) {
+                throw new waException(_ws("Page not found"), 404);
+            }
+            $route_hash = null;
+            if (shopInstantorderRouteHelper::getRouteSettings(null, 'status')) {
+                $route_hash = null;
+                $route_settings = shopInstantorderRouteHelper::getRouteSettings();
+            } elseif (shopInstantorderRouteHelper::getRouteSettings(0, 'status')) {
+                $route_hash = 0;
+                $route_settings = shopInstantorderRouteHelper::getRouteSettings(0);
+            } else {
+                throw new waException(_ws("Page not found"), 404);
+            }
+
             $cart_mode = waRequest::post('cart_mode', 0);
             $_items = waRequest::post('items', array());
             $customer = waRequest::post('customer', array());
@@ -17,6 +31,19 @@ class shopInstantorderPluginFrontendOrderController extends waJsonController {
             }
             $total = shopInstantorderItemsHelper::getItemsTotal($items);
 
+            if (!empty($route_settings['use_wholesale_plugin']) && class_exists('shopWholesale') && wa()->getPlugin('wholesale')->getSettings('status')) {
+                $result = shopWholesale::checkOrder($items);
+                if (!$result['result']) {
+                    throw new waException($result['message']);
+                }
+            }
+
+            if (!empty($route_settings['use_minsum_plugin']) && class_exists('shopMinsum') && wa()->getPlugin('minsum')->getSettings('status')) {
+                $result = shopMinsum::checkOrder($items);
+                if (!$result['result']) {
+                    throw new waException($result['message']);
+                }
+            }
 
             if (wa()->getUser()->isAuth()) {
                 $contact = wa()->getUser();

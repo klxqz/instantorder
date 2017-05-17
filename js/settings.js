@@ -6,7 +6,18 @@
             this.initButtons();
             this.initRouteSelector();
             this.initScroll();
+            this.initScrollTo();
             return this;
+        },
+        initScrollTo: function () {
+            $(document).on('click', 'a.scrollto', function () {
+                var elementClick = $(this).attr("href")
+                var destination = $(elementClick).offset().top;
+                jQuery("html:not(:animated),body:not(:animated)").animate({
+                    scrollTop: destination
+                }, 800);
+                return false;
+            });
         },
         initScroll: function () {
             $(window).scroll(function () {

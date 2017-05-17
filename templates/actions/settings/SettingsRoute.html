@@ -72,6 +72,37 @@
 <div class="clear-both"></div>
 
 <div class="field-group">
+    <h3>Интеграция с другими плагинами</h3>
+    <div class="field">
+        <div class="name">
+            Использовать плагин «<a class="scrollto" href="#wholesale-info">Минимальный заказ</a>»
+        </div>
+        <div class="value no-shift s-ibutton-checkbox">
+            <input type="hidden" name="route_settings[use_wholesale_plugin]" value="0">
+            <input type="checkbox" class="ibutton" name="route_settings[use_wholesale_plugin]" value="1"{if $route_settings.use_wholesale_plugin|default:0} checked{/if}>
+            <p class="hint">
+                Плагин «Быстрый заказ» может взаимодействовать с другим плагином «Минимальный заказ».<br/>
+                Подобная интеграция позволяет использовать плагину «Быстрый заказ» возможности «Минимального заказа»
+            </p>
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            Использовать плагин «<a class="scrollto" href="#minsum-info">Минимальная сумма заказа</a>»
+        </div>
+        <div class="value no-shift s-ibutton-checkbox">
+            <input type="hidden" name="route_settings[use_minsum_plugin]" value="0">
+            <input type="checkbox" class="ibutton" name="route_settings[use_minsum_plugin]" value="1"{if $route_settings.use_minsum_plugin|default:0} checked{/if}>
+            <p class="hint">
+                Плагин «Быстрый заказ» может взаимодействовать с другим плагином «Минимальная сумма заказа».<br/>
+                Подобная интеграция позволяет использовать плагину «Быстрый заказ» возможности «Минимальной суммы заказа»
+            </p>
+        </div>
+    </div>
+</div>
+<div class="clear-both"></div>
+
+<div class="field-group">
     <h3>Настройки плагина для корзины</h3>
 
     <div class="field">
@@ -120,7 +151,7 @@
             <strong>&lt;button class=&quot;instantorder-btn&quot; data-mode=&quot;products-list&quot; data-product-id=&quot;{ldelim}$p.id{rdelim}&quot;&gt;Купить в 1 клик&lt;/button&gt;</strong>
             <p class="hint">
                 Аналогичный код кнопки быстрого заказа необходимо добавить в шаблон вывода товаров. Таким шаблоном в зависимости от темы дизайна может быть, например, list-thumbs.html<br/>
-                <strong>data-product-id</strong> - обязательный параметр, в качестве значения принимает идентификатор товара. Данное значение, в зависимости от темы дизайна, может содержаться в переменной <strong>{ldelim}$p.id{rdelim}</strong> или <strong>{ldelim}$product.id{rdelim}</strong><br/>
+                <strong>data-product-id</strong> - обязательный параметр, который в качестве значения принимает идентификатор товара. Данное значение, в зависимости от темы дизайна, может содержаться в переменной <strong>{ldelim}$p.id{rdelim}</strong> или <strong>{ldelim}$product.id{rdelim}</strong><br/>
                 Также может быть использован необязательный параметр <strong>data-sku-id</strong>
             </p>
         </div>
@@ -140,7 +171,7 @@
             <input type="checkbox" class="ibutton" name="route_settings[enabled_select_sku]" value="1"{if $route_settings.enabled_select_sku|default:1} checked{/if}>
             <p class="hint">
                 Предлагать покупателю выбрать артикул товара, если их несколько и артикул не определен автоматически, такое может быть для запуска «Быстрого заказа» из списка товаров.<br/>
-                Если данный режим не включен, то в такой ситауции при соверщение «Быстрого заказа» будет браться артикул по умолчанию, который определен настройками товара в админ. панели
+                Если данный режим не включен, то в такой ситауции при совершении «Быстрого заказа» будет браться артикул по умолчанию, который определен настройками товара в админ. панели
             </p>
         </div>
     </div>

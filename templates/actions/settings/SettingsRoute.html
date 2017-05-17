@@ -1,0 +1,255 @@
+<div class="field-group">
+    <div class="field">
+        <div class="name">
+            Статус плагина для поселения
+        </div>
+        <div class="value no-shift s-ibutton-checkbox">
+            <input type="hidden" name="route_settings[status]" value="0">
+            <input type="checkbox" class="ibutton" name="route_settings[status]" value="1"{if $route_settings.status|default:0} checked{/if}>
+            <p class="hint">Чтобы плагин работал для выбранного поселения, необходимо задать «ВКЛ»</p>
+        </div>
+    </div>
+</div>
+
+<div class="field-group">
+    <h3>Общие настройки</h3>
+    <div class="field">
+        <div class="name">
+            Селектор кнопки быстрого заказа
+        </div>
+        <div class="value">
+            <input type="text" name="route_settings[instantorder_btn_selector]" value="{$route_settings.instantorder_btn_selector|default:'.instantorder-btn'|escape}" />
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            Заголовок всплывающего окна
+        </div>
+        <div class="value">
+            <input type="text" name="route_settings[modal_title]" value="{$route_settings.modal_title|default:'Оформление заказа'|escape}" />
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            Текст кнопки «Заказать»
+        </div>
+        <div class="value">
+            <input type="text" name="route_settings[order_btn_text]" value="{$route_settings.order_btn_text|default:'Оформить заказ'|escape}" />
+            <p class="hint">Текст кнопки оформления заказа во всплывающем окне плагина</p>
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            Цвет кнопки «Заказать»
+        </div>
+        <div class="value">
+            <select name="route_settings[order_btn_class]">
+                {foreach $btn_classes as $btn_class => $btn_color}
+                    <option value="{$btn_class}"{if $route_settings.order_btn_class|default:'btn-light-blue' == $btn_class} selected="selected"{/if}>{$btn_color}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            Текст кнопки «Закрыть»
+        </div>
+        <div class="value">
+            <input type="text" name="route_settings[close_btn_text]" value="{$route_settings.close_btn_text|default:'Продолжить покупки'|escape}" />
+            <p class="hint">Текст кнопки закрытия всплывающего окна плагина</p>
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            Маска для телефона
+        </div>
+        <div class="value">
+            <input type="text" name="route_settings[phone_mask]" value="{$route_settings.phone_mask|default:'+7 (999) 999-99-99'|escape}" />
+            <p class="hint">Номер телефона вводится согласно указанному формату. 9 - любая цифра</p>
+        </div>
+    </div>
+</div>
+<div class="clear-both"></div>
+
+<div class="field-group">
+    <h3>Настройки плагина для корзины</h3>
+
+    <div class="field">
+        <div class="name">
+            Пример кода кнопки быстрого заказа
+        </div>
+        <div class="value">
+            <strong>&lt;button class=&quot;instantorder-btn&quot; data-mode=&quot;cart&quot;&gt;Купить в 1 клик&lt;/button&gt;</strong>
+            <p class="hint">Аналогичный код кнопки быстрого заказа необходимо добавить в шаблон страницы товара. Таким шаблоном в зависимости от темы дизайна может быть, например, cart.html </p>
+        </div>
+    </div>
+</div>
+<div class="clear-both"></div>
+
+
+<div class="field-group">
+    <h3>Настройки плагина для страницы товара</h3>
+
+    <div class="field">
+        <div class="name">
+            Пример кода кнопки быстрого заказа
+        </div>
+        <div class="value">
+            <strong>&lt;button class=&quot;instantorder-btn&quot; data-mode=&quot;product&quot;&gt;Купить в 1 клик&lt;/button&gt;</strong>
+            <p class="hint">Аналогичный код кнопки быстрого заказа необходимо добавить в шаблон страницы товара. Таким шаблоном в зависимости от темы дизайна может быть, например, product.cart.html </p>
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            Селектор формы добавления товара в корзину
+        </div>
+        <div class="value">
+            <input type="text" name="route_settings[product_form_selector]" value="{$route_settings.product_form_selector|default:'form#cart-form, form#cart-form-dialog'|escape}" />
+        </div>
+    </div>
+</div>
+<div class="clear-both"></div>
+
+<div class="field-group">
+    <h3>Настройки плагина для списка товаров</h3>
+    <div class="field">
+        <div class="name">
+            Пример кода кнопки быстрого заказа
+        </div>
+        <div class="value">
+            <strong>&lt;button class=&quot;instantorder-btn&quot; data-mode=&quot;products-list&quot; data-product-id=&quot;{ldelim}$p.id{rdelim}&quot;&gt;Купить в 1 клик&lt;/button&gt;</strong>
+            <p class="hint">
+                Аналогичный код кнопки быстрого заказа необходимо добавить в шаблон вывода товаров. Таким шаблоном в зависимости от темы дизайна может быть, например, list-thumbs.html<br/>
+                <strong>data-product-id</strong> - обязательный параметр, в качестве значения принимает идентификатор товара. Данное значение, в зависимости от темы дизайна, может содержаться в переменной <strong>{ldelim}$p.id{rdelim}</strong> или <strong>{ldelim}$product.id{rdelim}</strong><br/>
+                Также может быть использован необязательный параметр <strong>data-sku-id</strong>
+            </p>
+        </div>
+    </div>
+</div>
+<div class="clear-both"></div>
+
+<div class="field-group">
+    <h3>Выбор артикула</h3>
+    <p class="hint"></p>
+    <div class="field">
+        <div class="name">
+            Выбор артикула
+        </div>
+        <div class="value no-shift s-ibutton-checkbox">
+            <input type="hidden" name="route_settings[enabled_select_sku]" value="0">
+            <input type="checkbox" class="ibutton" name="route_settings[enabled_select_sku]" value="1"{if $route_settings.enabled_select_sku|default:1} checked{/if}>
+            <p class="hint">
+                Предлагать покупателю выбрать артикул товара, если их несколько и артикул не определен автоматически, такое может быть для запуска «Быстрого заказа» из списка товаров.<br/>
+                Если данный режим не включен, то в такой ситауции при соверщение «Быстрого заказа» будет браться артикул по умолчанию, который определен настройками товара в админ. панели
+            </p>
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            Текст кнопки «Выбрать»
+        </div>
+        <div class="value">
+            <input type="text" name="route_settings[select_btn_text]" value="{$route_settings.select_btn_text|default:'Выбрать'|escape}" />
+            <p class="hint">Текст кнопки выбора артикула во всплывающем окне</p>
+        </div>
+    </div>
+</div>
+<div class="clear-both"></div>
+
+
+
+<div class="field-group">
+    <h3>Поля оформления заказа</h3>
+    <table class="table zebra" id="fields-table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Название</th>
+                <th>Поле</th>
+                <th>Обязательное</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach $route_settings.fields|default:[] as $field}
+                <tr data-id="{$field@iteration}">
+                    <td class="width-min"><i class="icon16 sort"></i></td>
+                    <td>
+                        <input class="long" type="text" name="route_settings[fields][{$field@iteration}][title]" value="{$field.title|escape}" />
+                    </td>
+                    <td>
+                        <select name="route_settings[fields][{$field@iteration}][name]">
+                            {if !empty($fields)}
+                                {foreach $fields as $_field}
+                                    <option value="{$_field.id}"{if $_field.id == $field.name} selected="selected"{/if}>{$_field.name}</option>
+                                {/foreach}
+                            {/if}
+                            {if !empty($address_fields)}
+                                <optgroup label="Адрес">
+                                    {foreach $address_fields as $address_field}
+                                        <option value="{$address_field.id}"{if $address_field.id == $field.name} selected="selected"{/if}>{$address_field.name}</option>
+                                    {/foreach}
+                                </optgroup>
+                            {/if}
+                        </select>
+                    </td>
+                    <td align="center">
+                        <input type="hidden" name="route_settings[fields][{$field@iteration}][required]" value="0" />
+                        <input type="checkbox" name="route_settings[fields][{$field@iteration}][required]" value="1"{if $field.required} checked="checked"{/if} />
+                    </td>
+                    <td class="width-min">
+                        <a class="delete-field-btn" href="#"><i class="icon16 delete"></i></a>
+                    </td>
+                </tr>
+            {/foreach}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>
+                    <input type="hidden" name="route_settings[comment_field][enabled]" value="0" />
+                    <input type="checkbox" name="route_settings[comment_field][enabled]" value="1"{if $route_settings.comment_field.enabled|default:''} checked="checked"{/if} />
+                </td>
+                <td>
+                    <input class="long" type="text" name="route_settings[comment_field][title]" value="{$route_settings.comment_field.title|default:'Комментарий'|escape}"{if !$route_settings.comment_field.enabled|default:''} disabled="disabled"{/if} />
+                </td>
+                <td>
+                    Комментарий к заказу
+                </td>
+                <td align="center">
+                    <input type="hidden" name="route_settings[comment_field][required]" value="0" />
+                    <input type="checkbox" name="route_settings[comment_field][required]" value="1"{if $route_settings.comment_field.required|default:''} checked="checked"{/if}{if !$route_settings.comment_field.enabled|default:''} disabled="disabled"{/if} />
+                </td>
+                <td>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <a href="#" class="add-field-btn"><i class="icon16 add"></i>Добавить</a>
+</div>
+
+
+
+{if !empty($templates)}
+    <div class="field-group">
+        <h3>Шаблоны</h3>
+        <div class="templates-block">
+            {foreach $templates as $key  => $template}
+                <div class="field">
+                    <div class="name">
+                        {$template.name|default:'Шаблон'}<br /><span class="hint">HTML + Smarty</span>
+                    </div>
+                    <div class="value no-shift">
+                        <a class="edit-template" href="#"><i class="icon16 edit"></i>Изменить шаблон</a><br/><br/>
+                        <div class="template-block">
+                            <textarea id="sf-template-{$key}" name="templates[{$key}][template]">{$template.template|default:''|escape}</textarea>
+                            {if $template.change_tpl|default:0}
+                                <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
+                                <input type="checkbox" name="templates[{$key}][reset_tpl]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            {/foreach}
+        </div>
+    </div>
+{/if}

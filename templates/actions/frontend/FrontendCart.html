@@ -1,0 +1,118 @@
+<div class="instantorder-content">
+    <form id="instantorder-order-form" action="post">
+        <input type="hidden" name="cart_mode" value="{$cart_mode|default:0}" />
+        {if !empty($errors)}
+            <div class="errors">
+                {$errors}
+            </div>
+        {else}
+            <table class="instantorder-items-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Наименование</th>
+                        <th>Количество</th>
+                        <th>Цена</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $cart.items as $item}
+                        <tr class="row" data-id="{$item.id}">
+                            <td class="img">
+                                <a href="{$wa->shop->productUrl($item.product)}" target="_blank">
+                                    {if $item.product.image_id}
+                                        {$wa->shop->productImgHtml($item.product, '47', ['alt' => $item.product.name, 'title' => $item.product.name])}
+                                    {else}
+                                        <img src="{$plugin_url}img/dummy47.png" alt="{$item.product.name|escape}" />
+                                    {/if}
+                                </a>
+                            </td>
+                            <td>
+                                <input type="hidden" name="items[{$item.id}][id]" value="{$item.id}" />
+                                <input type="hidden" name="items[{$item.id}][product_id]" value="{$item.product.id}" />
+                                <input type="hidden" name="items[{$item.id}][sku_id]" value="{$item.sku_id}" />
+                                <input type="hidden" name="items[{$item.id}][type]" value="product" />
+                                <a href="{$wa->shop->productUrl($item.product)}" target="_blank">{$item.product.name|escape}</a>
+                                {if $item.sku_name && $item.sku_name != $item.product.name}
+                                    &nbsp;{$item.sku_name|escape}
+                                {/if}
+                                {if $item.quantity < 1}
+                                    <div class="item-error">Данный товар недоступен для заказа</div>
+                                {/if}
+                                {if !empty($item.services)}
+                                    <div class="services">
+                                        {foreach $item.services as $service_id => $s}
+                                            <!-- one option -->
+                                            <div class="service" {if !empty($s.id)}data-id="{$s.id}"{/if}>
+                                                <input class="service-data" type="hidden" name="items[{$item.id}{$service_id}][id]" value="{$item.id}{$service_id}"{if empty($s.id)} disabled="disabled"{/if} />
+                                                <input class="service-data" type="hidden" name="items[{$item.id}{$service_id}][product_id]" value="{$item.product.id}"{if empty($s.id)} disabled="disabled"{/if} />
+                                                <input class="service-data" type="hidden" name="items[{$item.id}{$service_id}][sku_id]" value="{$item.sku_id}"{if empty($s.id)} disabled="disabled"{/if} />
+                                                <input class="service-data" type="hidden" name="items[{$item.id}{$service_id}][type]" value="service"{if empty($s.id)} disabled="disabled"{/if} />
+                                                <input class="service-data" type="hidden" name="items[{$item.id}{$service_id}][parent_id]" value="{$item.id}"{if empty($s.id)} disabled="disabled"{/if} />
+                                                <input class="service-data quantity" type="hidden" name="items[{$item.id}{$service_id}][quantity]" value="{$item.quantity}"{if empty($s.id)} disabled="disabled"{/if} />
+                                                <label>
+                                                    <input {if !empty($s.id)}checked{/if} type="checkbox" name="items[{$item.id}{$service_id}][service_id]" value="{$service_id}"> 
+                                                    {$s.name|escape} 
+                                                    {if $s.price && !isset($s.variants)}(<span>+{shop_currency_html($s.price, $s.currency)}</span>){/if}
+                                                </label>
+                                                {if isset($s.variants)}
+                                                    &nbsp;
+                                                    <select name="items[{$item.id}{$service_id}][service_variant_id]"{if empty($s.id)} disabled="disabled"{/if}>
+                                                        {foreach $s.variants as $variant_id => $v}
+                                                            <option {if $s.variant_id == $variant_id}selected{/if} value="{$variant_id}">{$v.name|escape} (+{shop_currency($v.price, $s.currency)})</option>
+                                                        {/foreach}
+                                                    </select>
+                                                {else}
+                                                    <input class="service-data" type="hidden" name="items[{$item.id}{$service_id}][service_variant_id]" value="{$s.variant_id}"{if empty($s.id)} disabled="disabled"{/if} >
+                                                {/if}
+                                            </div>
+                                        {/foreach}
+                                    </div>
+                                {/if}
+                            </td>
+                            <td>
+                                <div class="qty_block text-nowrap">
+                                    <a href="#" class="minus">-</a>
+                                    <input type="text" class="quantity" name="items[{$item.id}][quantity]" value="{$item.quantity}">
+                                    <a href="#" class="plus">+</a>
+                                </div>
+                            </td>
+                            <td class="text-nowrap item-full-price">
+                                {shop_currency_html($item.full_price, true)}
+                            </td>
+                            <td>
+                                {if count($cart.items) > 1}
+                                    <a href="#" class="delete" title="Удалить"></a>
+                                {/if}
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr class="discount">
+                        <td colspan="3" class="text-right">Скидка</td>
+                        <td colspan="2" class="cart-discount text-nowrap">{shop_currency_html($cart.discount, true)}</td>
+                    </tr>
+                    <tr class="total">
+                        <td colspan="3" class="text-right bold">Итого</td>
+                        <td colspan="2" class="cart-total text-nowrap">{shop_currency_html($cart.total, true)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="wa-form">
+                {$form->html()}
+
+                {if !empty($comment_field.enabled)}
+                    <div class="wa-field wa-field-comment{if !empty($comment_field.required)} wa-required{/if}">
+                        <div class="wa-name">{$comment_field.title}</div>
+                        <div class="wa-value">
+                            <textarea name="comment"></textarea>
+                        </div>
+                    </div>
+                </div>
+            {/if}
+        {/if}
+    </form>
+</div>

@@ -6,15 +6,14 @@
  */
 return array(
     'name' => 'Быстрый заказ',
-    'description' => 'Позволяет быстро оформить заказ',
+    'description' => 'Быстрое оформление заказа во всплывающем окне за 1 клик',
     'vendor' => '985310',
-    'version' => '1.2.0',
+    'version' => '2.0.0',
     'img' => 'img/instantorder.png',
     'frontend' => true,
     'shop_settings' => true,
     'handlers' => array(
-        'frontend_product' => 'frontendProduct',
-        'frontend_cart' => 'frontendCart',
+        'frontend_head' => 'frontendHead',
     ),
 );
 //EOF

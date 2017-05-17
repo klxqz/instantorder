@@ -1,0 +1,71 @@
+<div class="instantorder-content success">
+    <input type="hidden" name="cart_mode" value="{$cart_mode|default:0}" />
+    <h1>Спасибо!</h1>
+    <p>
+        Ваш заказ успешно оформлен. Мы свяжемся с вами в ближайшее время.<br />
+        Номер вашего заказа <strong>{shopHelper::encodeOrderId($order.id)}</strong>.
+    </p>
+</div>
+
+{*Пример кода отправки данных о заказе в метрику*}
+{*Подробнее https://yandex.ru/support/metrika/reports/e-commerce.xml*}
+{*
+<script type="text/javascript">
+    (function ($) {
+        console.log('Далее будет выполнена отправка данных о заказе в Метрику');
+        var yaParams = {
+        order_id: "{$order.id}",
+        order_price: {number_format($order.total, 2, '.', '')},
+        currency: "{$order.currency}",
+        exchange_rate: 1,
+        goods:
+            [
+            {foreach $order.items as $item}
+                {
+                    id: "{$item.id}",
+                    name: "{$item.name|escape}",
+                    price: {number_format($item.price, 2, '.', '')},
+                    quantity: {$item.quantity}
+                }{if !$item@last},{/if}
+            {/foreach}
+            ]
+        };
+        function goalCallback () {
+            console.log('Запрос в Метрику успешно отправлен');
+        }
+        //Вместо XXXXXX необходимо вставить код счетчика яндекс метрики
+        //ORDER - идентификатор цели
+        yaCounterXXXXXX.reachGoal('ORDER', yaParams, yaCallback);
+    })(jQuery);
+</script>
+*}
+
+
+{*Пример кода отправки данных о заказе в Google Analytics*}
+{*
+<script type="text/javascript">
+    (function ($) {
+        console.log('Далее будет выполнена отправка данных о заказе в Google');
+        ga('require', 'ecommerce', 'ecommerce.js');
+        ga('ecommerce:addTransaction', {
+            id: "{$order.id}",
+            affiliation: "Название магазина",
+            revenue: {number_format($order.total, 2, '.', '')},
+            shipping: 0,
+            tax: 0,
+            currency: "{$order.currency}"
+        });
+        {foreach $order.items as $item}
+            ga('ecommerce:addItem', {
+                id: "{$order.id}",
+                name: "{$item.name|escape}",
+                sku: "{$item.sku_id}",
+                category: "",
+                price: {number_format($item.price, 2, '.', '')},
+                quantity: {$item.quantity}
+            });
+        {/foreach}
+        ga('ecommerce:send'); 
+    })(jQuery);
+</script>
+*}

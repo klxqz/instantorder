@@ -221,6 +221,9 @@ class shopInstantorderPluginFrontendOrderController extends waJsonController {
     }
 
     protected static function determineStockIds($order) {
+        if (!class_exists('shopStockRulesModel')) {
+            return array(null, null);
+        }
         $stock_rules_model = new shopStockRulesModel();
         $rules = $stock_rules_model->getRules();
         $stocks = shopHelper::getStocks();

@@ -6,18 +6,7 @@
             this.initButtons();
             this.initRouteSelector();
             this.initScroll();
-            this.initScrollTo();
             return this;
-        },
-        initScrollTo: function () {
-            $(document).on('click', 'a.scrollto', function () {
-                var elementClick = $(this).attr("href")
-                var destination = $(elementClick).offset().top;
-                jQuery("html:not(:animated),body:not(:animated)").animate({
-                    scrollTop: destination
-                }, 800);
-                return false;
-            });
         },
         initScroll: function () {
             $(window).scroll(function () {
@@ -83,6 +72,24 @@
                 return false;
             });
 
+            $(document).on('change', 'input[name="route_settings[service_agreement]"]', function () {
+                if (!$(this).val()) {
+                    $('.text-editor').addClass('hidden');
+                } else {
+                    if ($(this).val() == 'notice') {
+                        $('.text-editor input[type=checkbox]').hide();
+                    } else {
+                        $('.text-editor input[type=checkbox]').show();
+                    }
+                    $('.text-editor textarea').val($(this).parent().data('default-text'));
+                    $('.text-editor').removeClass('hidden');
+                }
+            });
+            
+            $(document).on('click', '.generalte-example-link', function () {
+                $('.text-editor textarea').val($('input[name="route_settings[service_agreement]"]:checked').parent().data('default-text'));
+                return false;
+            });
         },
         initRouteSelector: function () {
             var self = this;
@@ -125,8 +132,12 @@
                             mode: "text/" + templates[i].mode,
                             tabMode: "indent",
                             height: "dynamic",
-                            lineWrapping: true
+                            lineWrapping: true,
+                            onChange: function (c) {
+                                c.save();
+                            }
                         });
+
                     }
 
                     $('[name="route_settings[comment_field][enabled]"]').change(function () {

@@ -85,7 +85,7 @@
                             self.order(r);
                             return false;
                         }
-                        if (u.find('input[name=cart_mode][value=1]').length) {
+                        if (u.find('.instantorder-content.success').length && u.find('input[name=cart_mode][value=1]').length) {
                             window.location.reload();
                         }
                     }
@@ -138,6 +138,14 @@
         },
         initValide: function (u) {
             u.find('#instantorder-order-form').validate({
+                errorPlacement: function (error, element) {
+                    if ($(element).closest('label').length) {
+                        $(element).closest('label').after(error);
+                    } else {
+                        $(element).after(error);
+                    }
+                },
+                errorElement: "div",
                 rules: {
                     terms: {
                         required: true

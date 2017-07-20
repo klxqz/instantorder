@@ -35,6 +35,8 @@ class shopInstantorderPluginFrontendCartAction extends waViewAction {
             'cart' => ifset($cart),
             'plugin_url' => wa()->getPlugin('instantorder')->getPluginStaticUrl(),
             'errors' => ifset($errors),
+            'service_agreement' => ifset($route_settings['service_agreement']),
+            'service_agreement_hint' => ifset($route_settings['service_agreement_hint']),
         ));
 
         $FrontendCart_tmp = shopInstantorderRouteHelper::getRouteTemplates($route_hash, 'FrontendCart');

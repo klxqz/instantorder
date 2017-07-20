@@ -20,15 +20,16 @@ class shopInstantorderPluginFrontendController extends waViewController {
         } else {
             throw new waException(_ws("Page not found"), 404);
         }
-        
+
         $sku_model = new shopProductSkusModel();
         $skus = $sku_model->getByField('product_id', waRequest::post('product_id'), true);
-        
+
         if (!waRequest::post('sku_id') && !waRequest::post('features') && !empty($route_settings['enabled_select_sku']) && count($skus) > 1) {
             $this->executeAction(new shopInstantorderPluginFrontendSelectSkuAction());
         } else {
             $this->executeAction(new shopInstantorderPluginFrontendCartAction());
         }
+        waSystem::popActivePlugin();
     }
 
 }

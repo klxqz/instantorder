@@ -22,6 +22,10 @@ class shopInstantorderPluginFrontendOrderController extends waJsonController {
                 throw new waException(_ws("Page not found"), 404);
             }
 
+            if (!empty($route_settings['service_agreement']) && $route_settings['service_agreement'] == 'checkbox' && !waRequest::post('service_agreement', 0)) {
+                throw new waException('Необходимо подтвердить согласие на обработку персональных данных');
+            }
+
             $cart_mode = waRequest::post('cart_mode', 0);
             $_items = waRequest::post('items', array());
             $customer = waRequest::post('customer', array());
@@ -61,6 +65,13 @@ class shopInstantorderPluginFrontendOrderController extends waJsonController {
                 foreach ($customer as $field => $value) {
                     $contact->set($field, $value);
                 }
+            }
+
+            $fields = ifset($route_settings['fields'], array());
+            $form = shopInstantorderHelper::getContactInfoForm($fields);
+
+            if (!$form->isValid($contact)) {
+                throw new waException('Неверно заполнены контактные данные');
             }
 
 

@@ -12,6 +12,7 @@
     padding: 5px 5px;
     color: #000;
     vertical-align: top;
+    background: unset;
 }
 .instantorder-content table.instantorder-items-table th{
     font-weight: bold;
@@ -32,12 +33,11 @@
     text-decoration: underline;
 }
 
-.instantorder-content .qty_block input {
+.instantorder-content .qty_block input.quantity {
     width: 30px;
     height: 20px;
     display: inline-block;
     margin: 0;
-    padding: 0;
     outline: 0;
     border: 1px solid #dddddd;
     border-top: 1px solid #cccccc;
@@ -52,16 +52,16 @@
     -webkit-transition: all 0.1s linear;
     transition: all 0.1s linear;
     vertical-align: top;
-
+    box-sizing: unset;
 }
 
-.instantorder-content .qty_block input:hover {
+.instantorder-content .qty_block input.quantity:hover {
     border: 1px solid #bbbbbb;
     border-top: 1px solid #aaaaaa;
 }
 
-.instantorder-content .qty_block input:focus,
-.instantorder-content .qty_block input:active {
+.instantorder-content .qty_block input.quantity:focus,
+.instantorder-content .qty_block input.quantity:active {
     border-color: rgba(82, 168, 236, 0.8);
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.3);
     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.3);
@@ -96,6 +96,7 @@
     -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
     -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+    box-sizing: unset;
 }
 
 .instantorder-content .qty_block .minus:active,
@@ -166,3 +167,13 @@
 .instantorder-content .services{
     margin-top: 10px;
 }
+
+
+.instantorder-content .wa-form .wa-field .wa-value input[type="text"], 
+.instantorder-content .wa-form .wa-field .wa-value input[type="email"], 
+.instantorder-content .wa-form .wa-field .wa-value input[type="password"] {
+    margin: 0;
+    min-width: 260px;
+    width: 30%;
+}
+.instantorder-content .wa-form .wa-field .wa-value textarea { min-width: 300px; height: 70px; }

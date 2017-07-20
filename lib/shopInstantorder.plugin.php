@@ -69,7 +69,7 @@ class shopInstantorderPlugin extends shopPlugin {
         if (!empty($templates)) {
             foreach ($templates as $template_id => $template) {
                 $s_template = self::$templates[$template_id];
-                if (!empty($template['reset_tpl'])) {
+                if (!empty($template['reset_tpl']) || waRequest::post('reset_tpl_all')) {
                     $tpl_full_path = $s_template['tpl_path'] . $route_hash . '.' . $s_template['tpl_name'] . '.' . $s_template['tpl_ext'];
                     $template_path = wa()->getDataPath($tpl_full_path, $s_template['public'], 'shop', true);
                     @unlink($template_path);

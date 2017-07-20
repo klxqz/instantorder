@@ -256,6 +256,42 @@
         </tfoot>
     </table>
     <a href="#" class="add-field-btn"><i class="icon16 add"></i>Добавить</a>
+
+
+
+
+</div>
+
+<div class="field-group">
+    <div class="field">
+        <div class="name">
+            Обработка персональных данных
+        </div>
+        <div class="value">
+            <label>
+                <input type="radio" name="route_settings[service_agreement]" value=""{if !$route_settings.service_agreement|default:''} checked="checked"{/if} />
+                Не требовать согласия с политикой обработки персональных данных
+            </label>
+        </div>
+        <div class="value">
+            <label data-default-text="Нажимая на кнопку подтверждения, я соглашаюсь с &lt;a href=&quot;---ВСТАВЬТЕ СЮДА ССЫЛКУ НА ДОКУМЕНТ!---&quot;&gt;политикой обработки персональных данных&lt;/a&gt;">
+                <input type="radio" name="route_settings[service_agreement]" value="notice"{if $route_settings.service_agreement|default:'' == 'notice'} checked="checked"{/if}  />
+                Не требовать согласия с политикой обработки персональных данных
+            </label>
+        </div>
+        <div class="value">
+            <label data-default-text="Я согласен с &lt;a href=&quot;---ВСТАВЬТЕ СЮДА ССЫЛКУ НА ДОКУМЕНТ!---&quot;&gt;политикой обработки персональных данных&lt;/a&gt;">
+                <input type="radio" name="route_settings[service_agreement]" value="checkbox"{if $route_settings.service_agreement|default:'' == 'checkbox'} checked="checked"{/if} />
+                Предлагать включить обязательный флажок с подсказкой и ссылкой
+            </label>
+        </div>
+        <div class="{if !$route_settings.service_agreement|default:''}hidden {/if}value text-editor">
+            <input style="vertical-align: top; margin: 0px 2px 90px; float: left; {if $route_settings.service_agreement|default:'' != 'checkbox'}display: none;{/if}" checked="" disabled="" type="checkbox">
+            <textarea name="route_settings[service_agreement_hint]">{$route_settings.service_agreement_hint|default:''|escape}</textarea>
+            <br/>
+            <span class="hint"><a href="javascript:void(0)" class="inline-link generalte-example-link"><b><i>Восстановить стандартный текст</i></b></a></span>
+        </div>
+    </div>
 </div>
 
 
@@ -264,6 +300,7 @@
     <div class="field-group">
         <h3>Шаблоны</h3>
         <div class="templates-block">
+            {$reset_tpl_all = false}
             {foreach $templates as $key  => $template}
                 <div class="field">
                     <div class="name">
@@ -276,11 +313,22 @@
                             {if $template.change_tpl|default:0}
                                 <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
                                 <input type="checkbox" name="templates[{$key}][reset_tpl]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+                                {$reset_tpl_all = true}
                             {/if}
                         </div>
                     </div>
                 </div>
             {/foreach}
+            {if $reset_tpl_all}
+                <div class="field">
+                    <div class="name">
+                        Сбросить изменения во всех шаблонах
+                    </div>
+                    <div class="value">
+                        <input type="checkbox" name="reset_tpl_all" value="1" />
+                    </div>
+                </div>
+            {/if}
         </div>
     </div>
 {/if}

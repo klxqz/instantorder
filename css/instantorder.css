@@ -177,3 +177,6 @@
     width: 30%;
 }
 .instantorder-content .wa-form .wa-field .wa-value textarea { min-width: 300px; height: 70px; }
+
+.instantorder-content .wa-form .wa-field-captcha a { text-decoration: none; }
+.instantorder-content .wa-form .wa-field-captcha .wa-value .vertical { height: 40px; display: table-cell; vertical-align: middle;  }

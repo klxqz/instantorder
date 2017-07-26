@@ -294,6 +294,48 @@
     </div>
 </div>
 
+<div class="field-group">
+    <div class="field">
+        <div class="name">
+            Капча
+        </div>
+        <div class="value">
+            <label>
+                <input type="radio" name="route_settings[captcha]" value=""{if !$route_settings.captcha|default:''} checked="checked"{/if} />
+                Без капчи
+            </label>
+        </div>
+        <div class="value">
+            <label>
+                <input type="radio" name="route_settings[captcha]" value="waCaptcha"{if $route_settings.captcha|default:'' == 'waCaptcha'} checked="checked"{/if}  />
+                Капча Webasyst 
+            </label>
+        </div>
+        <div class="value">
+            <label>
+                <input type="radio" name="route_settings[captcha]" value="waReCaptcha"{if $route_settings.captcha|default:'' == 'waReCaptcha'} checked="checked"{/if} />
+                Google reCAPTCHA
+            </label>
+        </div>
+        <div class="{if $route_settings.captcha|default:'' != 'waReCaptcha'}hidden {/if}value recaptcha-settings">
+            <div style="display: block;">
+                <div class="field">
+                    <div class="name">Site Key</div>
+                    <div class="value">
+                        <input name="route_settings[captcha_sitekey]" value="{$route_settings.captcha_sitekey|default:''}" type="text">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="name">Secret</div>
+                    <div class="value">
+                        <input name="route_settings[captcha_secret]" value="{$route_settings.captcha_secret|default:''}" type="text">
+                        <p class="hint">Получите ключи Google reCAPTCHA для вашего сайта по адресу <a href="https://www.google.com/recaptcha" target="_blank">https://www.google.com/recaptcha</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 {if !empty($templates)}

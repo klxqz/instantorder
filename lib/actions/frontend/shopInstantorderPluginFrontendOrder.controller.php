@@ -26,6 +26,22 @@ class shopInstantorderPluginFrontendOrderController extends waJsonController {
                 throw new waException('Необходимо подтвердить согласие на обработку персональных данных');
             }
 
+            if (!empty($route_settings['captcha'])) {
+                $code = waRequest::post('captcha');
+                if ($route_settings['captcha'] == 'waReCaptcha') {
+                    $options = array(
+                        'sitekey' => $route_settings['captcha_sitekey'],
+                        'secret' => $route_settings['captcha_secret'],
+                    );
+                    $captcha = new waReCaptcha($options);
+                } elseif ($route_settings['captcha'] == 'waCaptcha') {
+                    $captcha = new waCaptcha();
+                }
+                if (!$captcha->isValid($code)) {
+                    throw new waException('Капча введена неверно');
+                }
+            }
+
             $cart_mode = waRequest::post('cart_mode', 0);
             $_items = waRequest::post('items', array());
             $customer = waRequest::post('customer', array());
@@ -182,8 +198,8 @@ class shopInstantorderPluginFrontendOrderController extends waJsonController {
                 }
             }
 
-            if (isset($checkout_data['comment'])) {
-                $order['comment'] = $checkout_data['comment'];
+            if (!empty($route_settings['comment_field']['enabled']) && waRequest::post('comment')) {
+                $order['comment'] = waRequest::post('comment');
             }
 
             list($stock_id, $virtualstock_id) = self::determineStockIds($order);

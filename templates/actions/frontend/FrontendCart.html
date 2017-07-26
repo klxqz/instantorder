@@ -115,6 +115,32 @@
                     </div>
                 {/if}
 
+                {*$wa->captcha()*}
+
+                {if $captcha == 'waCaptcha'}
+                    <div class="wa-field wa-field-captcha">
+                        <div class="wa-name">
+                            <a href="#" title="Обновить">
+                                <img class="wa-captcha-img" src="{$wa->captchaUrl()}">
+                            </a>
+                            <strong>&rarr;</strong>
+                        </div>
+                        <div class="wa-value">
+                            <div class="vertical">
+                                <input type="text" name="captcha" class="wa-captcha-input" autocomplete="off" />
+                            </div>
+                        </div>
+                    </div>
+                {elseif $captcha == 'waReCaptcha'}
+                    <div class="wa-field wa-field-captcha">
+                        <div class="wa-name">
+                        </div>
+                        <div class="wa-value">
+                            {$recaptcha->getHtml()}
+                        </div>
+                    </div>
+                {/if}
+
                 {if $service_agreement}
                     <div class="wa-field">
                         <div class="wa-value{if $service_agreement == 'checkbox'} wa-required{/if}">

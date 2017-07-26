@@ -85,10 +85,18 @@
                     $('.text-editor').removeClass('hidden');
                 }
             });
-            
+
             $(document).on('click', '.generalte-example-link', function () {
                 $('.text-editor textarea').val($('input[name="route_settings[service_agreement]"]:checked').parent().data('default-text'));
                 return false;
+            });
+
+            $(document).on('change', 'input[name="route_settings[captcha]"]', function () {
+                if ($(this).val() == 'waReCaptcha') {
+                    $('.recaptcha-settings').removeClass('hidden');
+                } else {
+                    $('.recaptcha-settings').addClass('hidden');
+                }
             });
         },
         initRouteSelector: function () {

@@ -28,6 +28,16 @@ class shopInstantorderPluginFrontendCartAction extends waViewAction {
         }
         $fields = ifset($route_settings['fields'], array());
 
+        if (!empty($route_settings['captcha'])) {
+            if ($route_settings['captcha'] == 'waReCaptcha') {
+                $options = array(
+                    'sitekey' => $route_settings['captcha_sitekey'],
+                    'secret' => $route_settings['captcha_secret'],
+                );
+                $recaptcha = new waReCaptcha($options);
+            }
+        }
+
         $this->view->assign(array(
             'cart_mode' => waRequest::post('cart', 0),
             'form' => shopInstantorderHelper::getContactInfoForm($fields),
@@ -37,6 +47,8 @@ class shopInstantorderPluginFrontendCartAction extends waViewAction {
             'errors' => ifset($errors),
             'service_agreement' => ifset($route_settings['service_agreement']),
             'service_agreement_hint' => ifset($route_settings['service_agreement_hint']),
+            'captcha' => ifset($route_settings['captcha']),
+            'recaptcha' => ifset($recaptcha),
         ));
 
         $FrontendCart_tmp = shopInstantorderRouteHelper::getRouteTemplates($route_hash, 'FrontendCart');

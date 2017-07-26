@@ -117,6 +117,19 @@
             this.initValide(u);
             this.initMaskedInput(u);
             this.checkItems(u);
+            this.initCaptcha(u);
+        },
+        initCaptcha: function (u) {
+            if (!u.find('.wa-field-captcha').length) {
+                return;
+            }
+            u.find('.wa-captcha-img').click(function () {
+                $(this).attr('src', $(this).attr('src').replace(/\?.*$/, '?rid=' + Math.random()));
+                $(this).one('load', function () {
+                    u.find('.wa-captcha-input').focus();
+                });
+                return false;
+            });
         },
         checkItems: function (u) {
             u.find('.instantorder-items-table .qty_block .quantity').each(function () {
@@ -155,7 +168,7 @@
                     terms: "Это поле обязательное для заполнения"
                 }
             });
-            u.find('#instantorder-order-form .wa-required').find('input:visible, textarea:visible').each(function () {
+            u.find('#instantorder-order-form .wa-required, #instantorder-order-form .wa-field-captcha').find('input:visible, textarea:visible').each(function () {
                 $(this).rules('add', {
                     required: true,
                     messages: {
